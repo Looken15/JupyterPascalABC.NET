@@ -47,6 +47,9 @@
     <Reference Include="NetMQ, Version=4.0.1.8, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
       <HintPath>packages\NetMQ.4.0.1.8\lib\net47\NetMQ.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -81,9 +84,13 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZeroMQ, Version=4.1.0.31, Culture=neutral, PublicKeyToken=4a9630883fd6c563, processorArchitecture=MSIL">
+      <HintPath>packages\ZeroMQ.4.1.0.31\lib\net40\ZeroMQ.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="connection.cs" />
+    <Compile Include="Messages\connection.cs" />
+    <Compile Include="Messages\Header.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -98,5 +105,7 @@
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\System.Text.Json.6.0.2\build\System.Text.Json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Text.Json.6.0.2\build\System.Text.Json.targets'))" />
+    <Error Condition="!Exists('packages\ZeroMQ.4.1.0.31\build\net40\ZeroMQ.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ZeroMQ.4.1.0.31\build\net40\ZeroMQ.targets'))" />
   </Target>
+  <Import Project="packages\ZeroMQ.4.1.0.31\build\net40\ZeroMQ.targets" Condition="Exists('packages\ZeroMQ.4.1.0.31\build\net40\ZeroMQ.targets')" />
 </Project>
