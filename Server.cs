@@ -58,6 +58,9 @@ namespace ZMQServer
                 messageBytes.Add(shellSocket.ReceiveFrameBytes());
 
                 ShellMessageReceived?.Invoke(identeties, messageBytes);
+
+                identeties.Clear();
+                messageBytes.Clear();
             }
         }
 
@@ -67,51 +70,58 @@ namespace ZMQServer
             var HMACSignature = message[0];
             var parentHeader = (Header)JsonSerializer.Deserialize(message[1], typeof(Header));
 
-            Logger.Log(message, Logger.shellFilename);
-
-            SendStatus("busy", parentHeader, identeties);
-
-            switch (parentHeader.msg_type)
+            if (!parentHeader.session.Contains(parentHeader.msg_id))
             {
-                case "kernel_info_request":
-                    var metadata = Dict();
-                    var content = Dict("status", "ok",
-                                "protocol_version", "5.3.0",
-                                "implementation", "jupyterPascal",
-                                "implementation_version", "0.0.1",
-                                "language_info", Dict("name", "PascalABC.NET",
-                                                      "version", "1.0",
-                                                      "mimetype", "html\\text",
-                                                      "file_extension", ".pas"),
-                                "banner", "Hello World!");
-                    var ourHeader = Dict("msg_id", Guid.NewGuid(),
-                                         "session", parentHeader.session,
-                                         "username", "username",
-                                         "date", DateTime.Now,
-                                         "msg_type", "kernel_info_reply",
-                                         "version", "5.3.0");
+                Logger.Log(message, Logger.shellFilename);
 
-                    foreach (var item in identeties)
-                    {
-                        shellSocket.SendMoreFrame(item);
-                    }
-                    shellSocket.SendMoreFrame("<IDS|MSG>");
-                    shellSocket.SendMoreFrame(CreateSign(currentConnection.key,
-                                                         new List<string>() {
+                SendStatus("busy", parentHeader, identeties);
+
+                switch (parentHeader.msg_type)
+                {
+                    case "kernel_info_request":
+                        var metadata = Dict();
+                        var content = Dict("status", "ok",
+                                    "protocol_version", "5.3",
+                                    "implementation", "jupyterPascal",
+                                    "implementation_version", "0.0.1",
+                                    "language_info", Dict("name", "PascalABC.NET",
+                                                          "version", "1.0",
+                                                          "mimetype", "html\\text",
+                                                          "file_extension", ".pas"),
+                                    "banner", "Hello World!");
+                        var ourHeader = Dict("msg_id", Guid.NewGuid(),
+                                             "session", global_session,
+                                             "username", "username",
+                                             "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
+                                             "msg_type", "kernel_info_reply",
+                                             "version", "5.3");
+
+                        foreach (var item in identeties)
+                        {
+                            shellSocket.SendMoreFrame(item);
+                        }
+                        shellSocket.SendMoreFrame("<IDS|MSG>");
+                        shellSocket.SendMoreFrame(CreateSign(currentConnection.key,
+                                                             new List<string>() {
                                                                  JsonSerializer.Serialize(ourHeader),
                                                                  JsonSerializer.Serialize(parentHeader.ToDict()),
                                                                  JsonSerializer.Serialize(metadata),
                                                                  JsonSerializer.Serialize(content)
-                                                         }));
-                    shellSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
-                    shellSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
-                    shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
-                    shellSocket.SendFrame(JsonSerializer.Serialize(content));
+                                                             }));
+                        shellSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
+                        shellSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
+                        shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
+                        shellSocket.SendFrame(JsonSerializer.Serialize(content));
 
-                    break;
-                default:
+                        break;
 
-                    break;
+                    case "execute_request":
+                        
+                        break;
+                    default:
+
+                        break;
+                }
             }
 
             SendStatus("idle", parentHeader, identeties);
@@ -120,17 +130,19 @@ namespace ZMQServer
         private void SendStatus(string status, Header parentHeader, List<byte[]> identeties)
         {
             var ourHeader = Dict("msg_id", Guid.NewGuid(),
-                                         "session", parentHeader.session,
+                                         "session", global_session,
                                          "username", "username",
-                                         "date", DateTime.Now,
+                                         "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
                                          "msg_type", "status",
-                                         "version", "5.3.0");
+                                         "version", "5.3");
             var metadata = Dict();
             var content = Dict("execution_state", status);
+
             foreach (var item in identeties)
             {
                 iopubSocket.SendMoreFrame(item);
             }
+
             iopubSocket.SendMoreFrame("<IDS|MSG>");
             iopubSocket.SendMoreFrame(CreateSign(currentConnection.key,
                                                  new List<string>() {
@@ -211,7 +223,7 @@ namespace ZMQServer
         Thread iopubSocketLoop = null;
         Thread hbSocketLoop = null;
 
-
+        Guid global_session;
 
 
         public Server()
@@ -221,11 +233,15 @@ namespace ZMQServer
 
         private void Init()
         {
+            global_session = Guid.NewGuid();
+
             connectionFilePath = Directory.GetFiles(runtimePath, "kernel*")
                                 .Select(x => new { path = x, creationTime = File.GetCreationTime(x) })
                                 .OrderByDescending(x => x.creationTime)
                                 .First()
                                 .path;
+
+            Logger.Log(connectionFilePath, "123.txt");
 
             jsonConnectionFile = File.ReadAllText(connectionFilePath);
 
@@ -242,6 +258,7 @@ namespace ZMQServer
             shellSocket.Bind(shellAddress);
             iopubSocket.Bind(iopubAddress);
             hbSocket.Bind(hbAddress);
+
             ShellMessageReceived += ShellMessageProcessing;
         }
     }

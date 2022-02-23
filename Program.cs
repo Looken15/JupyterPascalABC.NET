@@ -20,7 +20,6 @@ namespace ZMQServer
 
             Server server = new Server();
             server.StartLoops();
-            Console.ReadKey();
         }
     }
 }
