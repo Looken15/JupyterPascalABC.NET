@@ -16,110 +16,15 @@ namespace ZMQServer
 {
     public class Server
     {
-        public void ServerRoutineStart()
-        {
-            string HMACsignature = "";
-
-            string headerString = "";
-            string parentHeaderString = "";
-            string metadataString = "";
-            string contentString = "";
-
-            List<byte[]> identeties = new List<byte[]>();
-
-            while (true)
-            {
-                if (hbSocket.TryReceiveFrameBytes(out var hb))
-                    File.AppendAllText(logPath, Encoding.UTF8.GetString(hb));
-
-                var text = "";
-                var rec = new byte[1000];
-
-                while (text != "<IDS|MSG>")
-                {
-                    rec = shellSocket.ReceiveFrameBytes();
-                    text = Encoding.UTF8.GetString(rec);
-                    if (text == "<IDS|MSG>")
-                    {
-                        break;
-                    }
-                    identeties.Add(rec);
-                }
-
-                //signature
-                rec = shellSocket.ReceiveFrameBytes();
-                text = Encoding.UTF8.GetString(rec);
-                HMACsignature = text;
-
-                //header
-                rec = shellSocket.ReceiveFrameBytes();
-                headerString = Encoding.UTF8.GetString(rec);
-                var serializedHeader = (Header)JsonSerializer.Deserialize(headerString, typeof(Header));
-
-                //parent header
-                rec = shellSocket.ReceiveFrameBytes();
-                parentHeaderString = Encoding.UTF8.GetString(rec);
-
-                //metadata
-                rec = shellSocket.ReceiveFrameBytes();
-                metadataString = Encoding.UTF8.GetString(rec);
-
-                //content
-                rec = shellSocket.ReceiveFrameBytes();
-                contentString = Encoding.UTF8.GetString(rec);
-
-                switch (serializedHeader.msg_type)
-                {
-                    case "kernel_info_request":
-                        var metadata = Dict();
-                        var content = Dict("status", "ok",
-                                    "protocol_version", "5.3.0",
-                                    "implementation", "jupyterPascal",
-                                    "implementation_version", "0.0.1",
-                                    "language_info", Dict("name", "PascalABC.NET",
-                                                          "version", "1.0",
-                                                          "mimetype", "html\\text",
-                                                          "file_extension", ".pas"),
-                                    "banner", "Hello World!");
-                        var ourHeader = Dict("msg_id", Guid.NewGuid(),
-                                             "session", serializedHeader.session,
-                                             "username", "username",
-                                             "date", DateTime.Now,
-                                             "msg_type", "kernel_info_reply",
-                                             "version", "5.3.0");
-                        var parentHeader = serializedHeader;
-
-                        foreach (var item in identeties)
-                        {
-                            iopubSocket.SendMoreFrame(item);
-                        }
-                        iopubSocket.SendMoreFrame("<IDS|MSG>");
-                        iopubSocket.SendMoreFrame(CreateSign(currentConnection.key,
-                                                             new List<string>() {
-                                                                 JsonSerializer.Serialize(ourHeader),
-                                                                 JsonSerializer.Serialize(parentHeader.ToDict()),
-                                                                 JsonSerializer.Serialize(metadata),
-                                                                 JsonSerializer.Serialize(content)
-                                                             }));
-                        iopubSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
-                        iopubSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
-                        iopubSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
-                        iopubSocket.SendFrame(JsonSerializer.Serialize(content));
-                        break;
-                    default:
-
-                        break;
-                }
-            }
-        }
-
         public void StartLoops()
         {
             hbSocketLoop = new Thread(HBLoop);
             hbSocketLoop.Start();
+            Logger.Log("hb socket started", Logger.hbFilename);
 
             shellSocketLoop = new Thread(ShellLoop);
             shellSocketLoop.Start();
+            Logger.Log("shell socket started", Logger.shellFilename);
         }
 
         public delegate void MessageHandler(List<byte[]> identeties, List<byte[]> messageBytes);
@@ -162,7 +67,9 @@ namespace ZMQServer
             var HMACSignature = message[0];
             var parentHeader = (Header)JsonSerializer.Deserialize(message[1], typeof(Header));
 
-            SendStatus("busy",parentHeader,identeties);
+            Logger.Log(message, Logger.shellFilename);
+
+            SendStatus("busy", parentHeader, identeties);
 
             switch (parentHeader.msg_type)
             {
@@ -249,6 +156,7 @@ namespace ZMQServer
                 try
                 {
                     var bytes = hbSocket.ReceiveFrameBytes();
+                    Logger.Log("get message on hb socket", Logger.hbFilename);
                     hbSocket.SendFrame(bytes);
                 }
                 catch
@@ -286,9 +194,6 @@ namespace ZMQServer
         }
         private List<string> Encode(IEnumerable<byte[]> bytes) => bytes.Select(x => Encoding.UTF8.GetString(x)).ToList();
 
-
-        //public string logPath = "C:\\Users\\Tema-\\Desktop\\JupyterPascalABC.NET\\log.txt";
-        public string logPath = @"C:\Users\barakuda\Desktop\jupyter\logs";
         public string runtimePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\jupyter\\runtime\\";
         public string connectionFilePath;
         public string jsonConnectionFile;
@@ -306,7 +211,7 @@ namespace ZMQServer
         Thread iopubSocketLoop = null;
         Thread hbSocketLoop = null;
 
-        
+
 
 
         public Server()

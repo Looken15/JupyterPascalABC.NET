@@ -1,9 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\barakuda\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\barakuda\\.nuget\\packages",
-      "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      "C:\\Users\\Tema-\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Tema-\\.nuget\\packages"
     ]
   }
 }
