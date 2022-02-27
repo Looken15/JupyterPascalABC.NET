@@ -15,8 +15,8 @@ namespace ZMQServer
         public const string controlFilename = "control.txt";
         public const string stdinFilename = "stdin.txt";
 
-        //private const string logPath = @"C:\Users\Tema-\Desktop\JupyterPascalABC.NET\Log\";
-        public const string logPath = @"C:\Users\barakuda\Desktop\jupyter\logs\";
+        private const string logPath = @"C:\Users\Tema-\Desktop\JupyterPascalABC.NET\Log\";
+        //public const string logPath = @"C:\Users\barakuda\Desktop\jupyter\logs\";
 
         public static void Clear()
         {

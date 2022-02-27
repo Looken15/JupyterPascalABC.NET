@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 using ZMQServer.Messages;
 using NetMQ;
 using NetMQ.Sockets;
-
+using System.Diagnostics;
 
 namespace ZMQServer
 {
@@ -80,7 +80,8 @@ namespace ZMQServer
                     break;
 
                 case "execute_request":
-                    ExecuteRequestReply(identeties, parentHeader);
+                    var content = (ExecuteRequestContent)JsonSerializer.Deserialize(message[4], typeof(ExecuteRequestContent));
+                    ExecuteRequestReply(content, identeties, parentHeader);
                     break;
                 default:
 
@@ -95,17 +96,22 @@ namespace ZMQServer
                                          "session", global_session,
                                          "username", "username",
                                          "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
-                                         "msg_type", "status",
+                                         "msg_type", "execute_result",
                                          "version", "5.3");
             var metadata = Dict();
             var content = Dict("execution_count", executionCounter,
-                                "data", Dict("text/html",data),
+                                "data", Dict("text/html", data),
                                 "metadata", Dict());
 
             foreach (var item in identeties)
             {
                 iopubSocket.SendMoreFrame(item);
             }
+
+            Logger.Log(JsonSerializer.Serialize(ourHeader), "iopub.txt");
+            Logger.Log(JsonSerializer.Serialize(parentHeader.ToDict()), "iopub.txt");
+            Logger.Log(JsonSerializer.Serialize(metadata), "iopub.txt");
+            Logger.Log(JsonSerializer.Serialize(content), "iopub.txt");
 
             iopubSocket.SendMoreFrame("<IDS|MSG>");
             iopubSocket.SendMoreFrame(CreateSign(currentConnection.key,
@@ -121,7 +127,7 @@ namespace ZMQServer
             iopubSocket.SendFrame(JsonSerializer.Serialize(content));
         }
 
-        private void ExecuteRequestReply(List<byte[]> identeties, Header parentHeader)
+        private void ExecuteRequestReply(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
         {
             var metadata = Dict();
             var content = Dict("status", "ok",
@@ -150,7 +156,22 @@ namespace ZMQServer
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             shellSocket.SendFrame(JsonSerializer.Serialize(content));
 
-            SendExecutionData("ыыыыыыыы", parentHeader, identeties);
+
+            File.WriteAllText(Environment.CurrentDirectory + "\\PABCCompiler\\temp.pas", requestContent.code);
+
+            Process proc = new Process();
+
+            proc.StartInfo.FileName = Environment.CurrentDirectory + "\\PABCCompiler\\PABCCompilerRunner.exe";
+            proc.StartInfo.Arguments = "PABCCompiler\\temp.pas";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true; 
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.StandardOutputEncoding = Encoding.Default;
+            proc.Start();
+            StreamReader srIncoming = proc.StandardOutput;
+            string result = srIncoming.ReadToEnd();
+
+            SendExecutionData(result, parentHeader, identeties);
         }
 
         private void KernelInfoRequestReply(List<byte[]> identeties, Header parentHeader)
