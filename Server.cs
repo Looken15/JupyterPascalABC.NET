@@ -25,10 +25,15 @@ namespace ZMQServer
             shellSocketLoop = new Thread(ShellLoop);
             shellSocketLoop.Start();
             Logger.Log("shell socket started", Logger.shellFilename);
+
+            stdinSocketLoop = new Thread(StdinLoop);
+            stdinSocketLoop.Start();
+            Logger.Log("stdin socket started", Logger.stdinFilename);
         }
 
         public delegate void MessageHandler(List<byte[]> identeties, List<byte[]> messageBytes);
         public event MessageHandler? ShellMessageReceived;
+        public event MessageHandler? StdinMessageReceived;
 
         private void ShellLoop()
         {
@@ -88,6 +93,15 @@ namespace ZMQServer
                     break;
             }
             SendStatus("idle", parentHeader, identeties);
+        }
+
+        private void StdinMessageProcessing(List<byte[]> identeties, List<byte[]> messageBytes)
+        {
+            var message = Encode(messageBytes);
+            var content = message[4];
+            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
+            inputStream.WriteLine(dict["value"]);
+            inputStream.Close();
         }
 
         private void SendExecutionData(string data, Header parentHeader, List<byte[]> identeties)
@@ -156,22 +170,92 @@ namespace ZMQServer
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             shellSocket.SendFrame(JsonSerializer.Serialize(content));
 
+            //создаём временный .pas файл
 
-            File.WriteAllText(Environment.CurrentDirectory + "\\PABCCompiler\\temp.pas", requestContent.code);
+            File.WriteAllText(Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas", "uses RedirectIOMode1;\n");
+            File.AppendAllText(Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas", requestContent.code);
 
-            Process proc = new Process();
 
-            proc.StartInfo.FileName = Environment.CurrentDirectory + "\\PABCCompiler\\PABCCompilerRunner.exe";
-            proc.StartInfo.Arguments = "PABCCompiler\\temp.pas";
+            var tempProc = new Process();
+            tempProc.StartInfo.FileName = Environment.CurrentDirectory + $"\\PABCCompiler\\PABCCompilerRunner.exe";
+            tempProc.StartInfo.Arguments = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            tempProc.StartInfo.UseShellExecute = false;
+            tempProc.StartInfo.CreateNoWindow = true;
+            tempProc.StartInfo.RedirectStandardOutput = true;
+            tempProc.StartInfo.RedirectStandardError = true;
+            tempProc.StartInfo.RedirectStandardInput = true;
+            tempProc.Start();
+
+            tempProc.WaitForExit();
+
+            var proc = new Process();
+            proc.StartInfo.FileName = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
             proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true; 
+            proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.RedirectStandardError = true;
+            proc.StartInfo.RedirectStandardInput = true;
+            proc.StartInfo.StandardErrorEncoding = Encoding.Default;
+            proc.StartInfo.StandardInputEncoding = Encoding.Default;
             proc.StartInfo.StandardOutputEncoding = Encoding.Default;
-            proc.Start();
-            StreamReader srIncoming = proc.StandardOutput;
-            string result = srIncoming.ReadToEnd();
 
-            SendExecutionData(result, parentHeader, identeties);
+            proc.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
+            {
+                if (e.Data != null)
+                {
+                    var dataBytes = Encoding.UTF8.GetBytes(e.Data);
+                    var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
+                    var encodedData = Encoding.Default.GetString(encodedBytes);
+                    SendExecutionData(encodedData, parentHeader, identeties);
+                }
+            });
+
+            proc.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
+            {
+                if (e.Data == "[READLNSIGNAL]")
+                {
+                    SendInputRequest(parentHeader, identeties);
+                }
+            });
+
+            proc.Start();
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            inputStream = new StreamWriter(proc.StandardInput.BaseStream, Encoding.GetEncoding("cp866"));
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
+
+            proc.WaitForExit();
+        }
+
+        private void SendInputRequest(Header parentHeader, List<byte[]> identeties)
+        {
+            var ourHeader = Dict("msg_id", Guid.NewGuid(),
+                                         "session", global_session,
+                                         "username", "username",
+                                         "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
+                                         "msg_type", "input_request",
+                                         "version", "5.3");
+            var metadata = Dict();
+            var content = Dict("prompt", "",
+                               "password", 0);
+
+            foreach (var item in identeties)
+            {
+                stdinSocket.SendMoreFrame(item);
+            }
+
+            stdinSocket.SendMoreFrame("<IDS|MSG>");
+            stdinSocket.SendMoreFrame(CreateSign(currentConnection.key,
+                                                 new List<string>() {
+                                                         JsonSerializer.Serialize(ourHeader),
+                                                         JsonSerializer.Serialize(parentHeader.ToDict()),
+                                                         JsonSerializer.Serialize(metadata),
+                                                         JsonSerializer.Serialize(content)
+                                                 }));
+            stdinSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
+            stdinSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
+            stdinSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
+            stdinSocket.SendFrame(JsonSerializer.Serialize(content));
         }
 
         private void KernelInfoRequestReply(List<byte[]> identeties, Header parentHeader)
@@ -262,6 +346,40 @@ namespace ZMQServer
             }
         }
 
+        private void StdinLoop()
+        {
+            List<byte[]> identeties = new List<byte[]>();
+            List<byte[]> messageBytes = new List<byte[]>();
+            while (true)
+            {
+                var text = "";
+                while (text != "<IDS|MSG>")
+                {
+                    var rec = stdinSocket.ReceiveFrameBytes();
+                    text = Encoding.UTF8.GetString(rec);
+                    if (text == "<IDS|MSG>")
+                        break;
+                    identeties.Add(rec);
+                }
+
+                //signature
+                messageBytes.Add(stdinSocket.ReceiveFrameBytes());
+                //header
+                messageBytes.Add(stdinSocket.ReceiveFrameBytes());
+                //parent header
+                messageBytes.Add(stdinSocket.ReceiveFrameBytes());
+                //metadata
+                messageBytes.Add(stdinSocket.ReceiveFrameBytes());
+                //content
+                messageBytes.Add(stdinSocket.ReceiveFrameBytes());
+
+                StdinMessageReceived?.Invoke(identeties, messageBytes);
+
+                identeties.Clear();
+                messageBytes.Clear();
+            }
+        }
+
         private Dictionary<string, object> Dict(params object[] args)
         {
             var retval = new Dictionary<string, object>();
@@ -298,18 +416,23 @@ namespace ZMQServer
         RouterSocket shellSocket;
         PublisherSocket iopubSocket;
         ResponseSocket hbSocket;
+        RouterSocket stdinSocket;
 
         string shellAddress;
         string iopubAddress;
         string hbAddress;
+        string stdinAddress;
 
         Thread shellSocketLoop = null;
         Thread iopubSocketLoop = null;
         Thread hbSocketLoop = null;
+        Thread stdinSocketLoop = null;
 
         int executionCounter = 0;
 
         Guid global_session;
+
+        StreamWriter inputStream = null;
 
 
         public Server()
@@ -336,16 +459,20 @@ namespace ZMQServer
             shellSocket = new RouterSocket();
             iopubSocket = new PublisherSocket();
             hbSocket = new ResponseSocket();
+            stdinSocket = new RouterSocket();
 
             shellAddress = $"{currentConnection.transport}://{currentConnection.ip}:{currentConnection.shell_port}";
             iopubAddress = $"{currentConnection.transport}://{currentConnection.ip}:{currentConnection.iopub_port}";
             hbAddress = $"{currentConnection.transport}://{currentConnection.ip}:{currentConnection.hb_port}";
+            stdinAddress = $"{currentConnection.transport}://{currentConnection.ip}:{currentConnection.stdin_port}";
 
             shellSocket.Bind(shellAddress);
             iopubSocket.Bind(iopubAddress);
             hbSocket.Bind(hbAddress);
+            stdinSocket.Bind(stdinAddress);
 
             ShellMessageReceived += ShellMessageProcessing;
+            StdinMessageReceived += StdinMessageProcessing;
         }
     }
 }
