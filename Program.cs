@@ -18,7 +18,7 @@ namespace ZMQServer
         {
             Logger.Clear();
 
-            Server server = new Server();
+            Server server = new();
             server.StartLoops();
         }
     }
