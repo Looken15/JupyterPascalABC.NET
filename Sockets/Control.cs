@@ -107,8 +107,5 @@ namespace ZMQServer.Sockets
             Iopub.SendStatus("idle", parentHeader, identeties);
             Iopub.ClearOutput();
         }
-
-
-
     }
 }

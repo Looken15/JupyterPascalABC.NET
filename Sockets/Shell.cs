@@ -182,6 +182,7 @@ namespace ZMQServer.Sockets
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             inputStream = new StreamWriter(proc.StandardInput.BaseStream, Encoding.GetEncoding("cp866"));
+            inputStream.AutoFlush = true;
             proc.BeginOutputReadLine();
             proc.BeginErrorReadLine();
 

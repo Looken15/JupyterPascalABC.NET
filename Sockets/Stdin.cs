@@ -2,6 +2,7 @@
 using NetMQ.Sockets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -101,11 +102,12 @@ namespace ZMQServer.Sockets
 
         private static void StdinMessageProcessing(List<byte[]> identeties, List<byte[]> messageBytes)
         {
+            //inputStream = new StreamWriter(proc.StandardInput.BaseStream, Encoding.GetEncoding("cp866"));
             var message = Encode(messageBytes);
             var content = message[4];
             var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
             inputStream.WriteLine(dict["value"]);
-            inputStream.Close();
+            //inputStream.Close();
         }
     }
 }
