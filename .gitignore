@@ -7,3 +7,5 @@ packages\
 
 *.txt
 *.ipynb
+/.vs
+/obj/Release/net5.0
