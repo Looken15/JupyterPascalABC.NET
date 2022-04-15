@@ -4,7 +4,7 @@ interface
 {$reference 'PresentationCore.dll'}
 
 {$apptype windows}
-
+uses System.Windows;
 uses System.Windows.Media;
 
 ///типы кривой

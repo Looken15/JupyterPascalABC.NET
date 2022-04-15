@@ -2,7 +2,7 @@
 
 interface
 
-uses FigureModule, RendererModule;
+uses FigureModule, RendererModuleJS;
 
 type
   Figure = FigureModule.Figure;
@@ -40,12 +40,12 @@ end;
 
 procedure WindowSize(width, height: integer);
 begin
-  RendererModule.WindowSize(width, height);
+  RendererModuleJS.WindowSize(width, height);
 end;
 
 procedure Show(fig: Figure);
 begin
-  RendererModule.Show(fig);
+  RendererModuleJS.Show(fig);
 end;
 
 

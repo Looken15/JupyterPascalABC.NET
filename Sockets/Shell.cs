@@ -150,6 +150,7 @@ namespace ZMQServer.Sockets
 
             proc = new Process();
             proc.StartInfo.FileName = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
+            proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -158,7 +159,8 @@ namespace ZMQServer.Sockets
             proc.StartInfo.StandardErrorEncoding = Encoding.Default;
             proc.StartInfo.StandardInputEncoding = Encoding.Default;
             proc.StartInfo.StandardOutputEncoding = Encoding.Default;
-
+            var isUpdate = false;
+            var id = new Random().Next(1000).ToString();
             proc.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
             {
                 if (e.Data != null)
@@ -166,7 +168,18 @@ namespace ZMQServer.Sockets
                     var dataBytes = Encoding.UTF8.GetBytes(e.Data);
                     var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
                     var encodedData = Encoding.Default.GetString(encodedBytes);
-                    Iopub.SendExecutionData(encodedData, parentHeader, identeties);
+                    //Iopub.SendExecutionData(encodedData, parentHeader, identeties);
+                    
+                    //Iopub.SendExecutionData(encodedData, parentHeader, identeties);
+
+                    Iopub.SendDisplayData(encodedData, parentHeader, identeties, isUpdate, id);
+                    isUpdate = true;
+                   
+                    //Thread.Sleep(5000);
+                    //Iopub.SendDisplayData("<script>var cx = document.getElementById(\"plotterCanvas\").getContext(\"2d\");" +
+                    //                            "cx.fillStyle = \"rgb(255,0,0)\"" +
+                    //                            "cx.fillRect(0,0,400,400);</script>", parentHeader, identeties,true,id);
+                    //Iopub.SendExecutionData("<script>alert('Hello, world')</script>", parentHeader, identeties);
                 }
             });
 

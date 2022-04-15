@@ -25,6 +25,43 @@ namespace ZMQServer.Sockets
             iopubSocket.Bind(iopubAddress);
         }
 
+        public static void SendDisplayData(string data, Header parentHeader, List<byte[]> identeties, bool isUpdate = false, string displayId = null)
+        {
+            var ourHeader = Server.Dict("msg_id", Guid.NewGuid(),
+                                         "session", Server.global_session,
+                                         "username", "username",
+                                         "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
+                                         "msg_type", isUpdate?"update_display_data":"display_data",
+                                         "version", "5.3");
+            var metadata = Server.Dict();
+            var content = Server.Dict("data", Server.Dict("text/html", data),
+                                        "metadata", Server.Dict(),
+                                        "transient", Server.Dict("display_id", displayId ?? ""));
+
+            foreach (var item in identeties)
+            {
+                iopubSocket.SendMoreFrame(item);
+            }
+
+            Logger.Log(JsonSerializer.Serialize(ourHeader), "iopub.txt");
+            Logger.Log(JsonSerializer.Serialize(parentHeader.ToDict()), "iopub.txt");
+            Logger.Log(JsonSerializer.Serialize(metadata), "iopub.txt");
+            Logger.Log(JsonSerializer.Serialize(content), "iopub.txt");
+
+            iopubSocket.SendMoreFrame("<IDS|MSG>");
+            iopubSocket.SendMoreFrame(Server.CreateSign(Server.currentConnection.key,
+                                                 new List<string>() {
+                                                         JsonSerializer.Serialize(ourHeader),
+                                                         JsonSerializer.Serialize(parentHeader.ToDict()),
+                                                         JsonSerializer.Serialize(metadata),
+                                                         JsonSerializer.Serialize(content)
+                                                 }));
+            iopubSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
+            iopubSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
+            iopubSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
+            iopubSocket.SendFrame(JsonSerializer.Serialize(content));
+        }
+
         public static void SendExecutionData(string data, Header parentHeader, List<byte[]> identeties)
         {
             var ourHeader = Server.Dict("msg_id", Guid.NewGuid(),
