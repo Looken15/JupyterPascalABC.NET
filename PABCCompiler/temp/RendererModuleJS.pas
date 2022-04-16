@@ -3,8 +3,12 @@
 interface
 
 uses FigureModule, AxesModule;
+{$reference 'PresentationCore.dll'}
 
-uses System.Windows.Media; 
+{$apptype windows}
+uses System.Windows;
+uses System.Windows.Media;
+
 //uses FigureModule, AxesModule;
 
 ///шаг отрисовки
@@ -1191,12 +1195,12 @@ end;
 
 procedure FillRectangleJS(x,y,w,h:real; fillColor:Color);
 begin
-	OutputJS('Rct('+x+','+y+','+w+','+h+','+fillColor.R+','+fillColor.G+','+fillColor.B+');');
+	OutputJS('Rct('+x.ToString('0.000')+','+y.ToString('0.000')+','+w+','+h+','+fillColor.R+','+fillColor.G+','+fillColor.B+');');
 end;
 
 procedure DrawRectangleJS(x,y,w,h:real; fillColor, strokeColor:Color; width: real);
 begin
-	OutputJS('Rct('+x+','+y+','+w+','+h+','+fillColor.R+','+fillColor.G+','+fillColor.B+','+
+	OutputJS('Rct('+x.ToString('0.000')+','+y.ToString('0.000')+','+w+','+h+','+fillColor.R+','+fillColor.G+','+fillColor.B+','+
 					width+','+strokeColor.R+','+strokeColor.G+','+strokeColor.B+');');
 end;
 
@@ -1205,10 +1209,10 @@ begin
   var temp := new StringBuilder();
   temp += 'Lns([';
   for var i:= 0 to arr_x.Count-1 do
-    temp += arr_x[i].ToString+',';
+    temp += arr_x[i].ToString('0.000')+',';
   temp +='],[';
   for var i:= 0 to arr_y.Count-1 do
-    temp += arr_y[i].ToString+',';
+    temp += arr_y[i].ToString('0.000')+',';
   temp+='],'+width+','+lineColor.R+','+lineColor.G+','+lineColor.B+');';
   OutputJS(temp.ToString);
 end;
@@ -1218,8 +1222,8 @@ begin
    OutputJS('cx.strokeStyle = "rgb('+lineColor.R+','+lineColor.G+','+lineColor.B+')";'+
             'cx.lineWidth = '+width+';'+
             'cx.beginPath();'+
-            'cx.moveTo('+x1+','+y1+');'+
-            'cx.lineTo('+x2+','+y2+');'+
+            'cx.moveTo('+x1.ToString('0.000')+','+y1.ToString('0.000')+');'+
+            'cx.lineTo('+x2.ToString('0.000')+','+y2.ToString('0.000')+');'+
             'cx.stroke();');
 end;
 
@@ -1227,7 +1231,7 @@ procedure FillCircleJS(x,y,r:real; fillColor:Color);
 begin
    OutputJS('cx.fillStyle = "rgb('+fillColor.R+','+fillColor.G+','+fillColor.B+')";'+
             'cx.beginPath();'+
-            'cx.arc('+x+','+y+','+r+',0,'+(Pi*2)+');'+
+            'cx.arc('+x.ToString('0.000')+','+y.ToString('0.000')+','+r+',0,'+(Pi*2)+');'+
             'cx.fill();');
 end;
 
@@ -1236,10 +1240,10 @@ begin
   var temp := new StringBuilder();
   temp += 'Sct([';
   for var i:= 0 to arr_x.Count-1 do
-    temp += arr_x[i].ToString+',';
+    temp += arr_x[i].ToString('0.000')+',';
   temp +='],[';
   for var i:= 0 to arr_y.Count-1 do
-    temp += arr_y[i].ToString+',';
+    temp += arr_y[i].ToString('0.000')+',';
   temp+='],'+r+','+lineColor.R+','+lineColor.G+','+lineColor.B+');';
   OutputJS(temp.ToString);
 end;
@@ -1250,7 +1254,7 @@ begin
             'cx.fillStyle = "black";'+
             'cx.textAlign = "left";'+
             'cx.textBaseline = "top";'+
-            'cx.fillText("'+text+'", '+x+','+y+');');
+            'cx.fillText("'+text+'", '+x.ToString('0.000')+','+y.ToString('0.000')+');');
 end;
 
 procedure OutputJS(text :string);

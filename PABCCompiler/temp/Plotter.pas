@@ -20,9 +20,6 @@ procedure Show(fig: Figure);
 ///Задать размеры окна
 procedure WindowSize(width, height: integer);
 
-
-
-
 implementation
 
 function GetFigure(): Figure;
@@ -47,9 +44,6 @@ procedure Show(fig: Figure);
 begin
   RendererModuleJS.Show(fig);
 end;
-
-
-
 initialization
 
 finalization

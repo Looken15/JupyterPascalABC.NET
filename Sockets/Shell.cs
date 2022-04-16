@@ -135,21 +135,60 @@ namespace ZMQServer.Sockets
             File.WriteAllText(Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas", "uses RedirectIOMode1;\n");
             File.AppendAllText(Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas", requestContent.code);
 
+            var pasPath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            var exePath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
 
             var tempProc = new Process();
             tempProc.StartInfo.FileName = Environment.CurrentDirectory + $"\\PABCCompiler\\PABCCompiler.exe";
-            tempProc.StartInfo.Arguments = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            tempProc.StartInfo.Arguments = pasPath;
             tempProc.StartInfo.UseShellExecute = false;
             tempProc.StartInfo.CreateNoWindow = true;
             tempProc.StartInfo.RedirectStandardOutput = true;
             tempProc.StartInfo.RedirectStandardError = true;
             tempProc.StartInfo.RedirectStandardInput = true;
+            tempProc.StartInfo.StandardErrorEncoding = Encoding.Default;
+            tempProc.StartInfo.StandardInputEncoding = Encoding.Default;
+            tempProc.StartInfo.StandardOutputEncoding = Encoding.Default;
+            var isUpdate = false;
+            var id = new Random().Next(1000).ToString();                                //костыль
+            tempProc.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
+            {
+                if (e.Data != null)
+                {
+                    var dataBytes = Encoding.UTF8.GetBytes(e.Data);
+                    var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
+                    var encodedData = Encoding.Default.GetString(encodedBytes);
+                    File.Delete(pasPath);
+                    Iopub.SendDisplayData(encodedData, parentHeader, identeties, false, id);
+                    return;
+                }
+            });
+
+            tempProc.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
+            {
+                if (e.Data != null)
+                {
+                    var dataBytes = Encoding.UTF8.GetBytes(e.Data);
+                    var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
+                    var encodedData = Encoding.Default.GetString(encodedBytes);
+                    File.Delete(pasPath);
+                    Iopub.SendDisplayData(encodedData, parentHeader, identeties, false, id);
+                    return;
+                }
+            });
+
             tempProc.Start();
 
             tempProc.WaitForExit();
 
+            if (!File.Exists(exePath))
+            {
+                Iopub.SendDisplayData("Ошибка компиляции!", parentHeader, identeties, false, id);
+                return;
+            }
+
             proc = new Process();
-            proc.StartInfo.FileName = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
+            proc.StartInfo.FileName = exePath;
             proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
@@ -159,8 +198,7 @@ namespace ZMQServer.Sockets
             proc.StartInfo.StandardErrorEncoding = Encoding.Default;
             proc.StartInfo.StandardInputEncoding = Encoding.Default;
             proc.StartInfo.StandardOutputEncoding = Encoding.Default;
-            var isUpdate = false;
-            var id = new Random().Next(1000).ToString();
+            
             proc.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
             {
                 if (e.Data != null)
@@ -201,6 +239,8 @@ namespace ZMQServer.Sockets
 
             proc.WaitForExit();
 
+            File.Delete(pasPath);
+            File.Delete(exePath);
             //TODO: Прерывать выполнение программы
             //TODO: Сервер
         }

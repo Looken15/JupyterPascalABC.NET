@@ -1093,19 +1093,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Tema-\\.nuget\\packages\\": {}
+    "C:\\Users\\barakuda\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Tema-\\Desktop\\JupyterPascalABC.NET\\ZMQServer.csproj",
+      "projectUniqueName": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj",
       "projectName": "ZMQServer",
-      "projectPath": "C:\\Users\\Tema-\\Desktop\\JupyterPascalABC.NET\\ZMQServer.csproj",
-      "packagesPath": "C:\\Users\\Tema-\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Tema-\\Desktop\\JupyterPascalABC.NET\\obj\\",
+      "projectPath": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj",
+      "packagesPath": "C:\\Users\\barakuda\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Tema-\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\barakuda\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1151,7 +1156,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
       }
     }
   }
