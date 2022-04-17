@@ -1,8 +1,8 @@
-.vs\
-bin\
-obj\
-packages\
-.ipynb_checkpoints\
+.vs/
+bin/
+obj/
+packages/
+.ipynb_checkpoints/
 
 
 *.txt

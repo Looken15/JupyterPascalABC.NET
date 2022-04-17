@@ -21,8 +21,10 @@ namespace ZMQServer
 
         public static void Init()
         {
+            string exe = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string exeDir = System.IO.Path.GetDirectoryName(exe);
             if (logPath == null)
-                logPath = Environment.CurrentDirectory + @"\logs\";
+                logPath = exeDir + @"\logs\";
             if (!Directory.Exists(logPath))
                 Directory.CreateDirectory(logPath);
             Clear();

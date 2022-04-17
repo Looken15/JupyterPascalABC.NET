@@ -132,14 +132,18 @@ namespace ZMQServer.Sockets
 
             //создаём временный .pas файл
 
-            File.WriteAllText(Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas", "uses RedirectIOMode1;\n");
-            File.AppendAllText(Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas", requestContent.code);
+            //var pasPath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            //var exePath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
+            string exe = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string exeDir = System.IO.Path.GetDirectoryName(exe);
+            var pasPath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            var exePath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
 
-            var pasPath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
-            var exePath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
+            File.WriteAllText(pasPath, "uses RedirectIOMode1;\n");
+            File.AppendAllText(pasPath, requestContent.code);
 
             var tempProc = new Process();
-            tempProc.StartInfo.FileName = Environment.CurrentDirectory + $"\\PABCCompiler\\PABCCompiler.exe";
+            tempProc.StartInfo.FileName = exeDir + $"\\PABCCompiler\\PABCCompiler.exe";
             tempProc.StartInfo.Arguments = pasPath;
             tempProc.StartInfo.UseShellExecute = false;
             tempProc.StartInfo.CreateNoWindow = true;
@@ -189,7 +193,7 @@ namespace ZMQServer.Sockets
 
             proc = new Process();
             proc.StartInfo.FileName = exePath;
-            proc.StartInfo.WorkingDirectory = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\";
+            proc.StartInfo.WorkingDirectory = exeDir + $"\\PABCCompiler\\temp\\";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardOutput = true;
