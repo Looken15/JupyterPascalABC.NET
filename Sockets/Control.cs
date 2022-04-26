@@ -102,8 +102,8 @@ namespace ZMQServer.Sockets
                 controlSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
                 controlSocket.SendFrame(JsonSerializer.Serialize(content));
             }
-
-            proc.Kill();
+            if (proc!=null)
+                proc.Kill();
             Iopub.SendStatus("idle", parentHeader, identeties);
             Iopub.ClearOutput();
         }

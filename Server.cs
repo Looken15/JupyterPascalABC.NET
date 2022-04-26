@@ -23,6 +23,7 @@ namespace ZMQServer
             Stdin.StartLoop();
             Control.StartLoop();
             Shell.StartLoop();
+            Compiler.StartLoop();
         }
 
         public delegate void MessageHandler(List<byte[]> identeties, List<byte[]> messageBytes);
@@ -92,6 +93,7 @@ namespace ZMQServer
             HB.Init(currentConnection);
             Shell.Init(currentConnection);
             Iopub.Init(currentConnection);
+            Compiler.Init();
 
             shellIdenteties = new List<byte[]>();
             shellParentHeader = new Header();

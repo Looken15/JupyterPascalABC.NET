@@ -139,52 +139,113 @@ namespace ZMQServer.Sockets
             var pasPath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
             var exePath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
 
+            var code = "uses RedirectIOMode1;\n" + requestContent.code;
+            var id = new Random().Next(1000).ToString();
+
+            Compiler.OutputHandler tempOutput;
+            tempOutput = (string s) =>
+            {
+                //if (s == "[END]")
+                //    Compiler.OutputReceived.
+                Iopub.SendDisplayData(s, parentHeader, identeties, false, id);
+            };
+
+            Compiler.OutputReceived += tempOutput;
+
+            
+            var compilationResult = Compiler.RequestCompilation(code);
+            if (compilationResult != "[OK]")
+            {
+                Iopub.SendDisplayData(compilationResult, parentHeader, identeties, false, id);
+                return;
+            }
+
+            
+            File.Delete(pasPath);
+            File.Delete(exePath);
+            //TODO: Прерывать выполнение программы
+            //TODO: Сервер
+        }
+
+
+        private static void ExecuteRequestReply_old(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
+        {
+            var metadata = Dict();
+            var content = Dict("status", "ok",
+                                "execution_count", ++executionCounter);
+            var ourHeader = Dict("msg_id", Guid.NewGuid(),
+                                 "session", global_session,
+                                 "username", "username",
+                                 "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
+                                 "msg_type", "execute_reply",
+                                 "version", "5.3");
+
+            foreach (var item in identeties)
+            {
+                shellSocket.SendMoreFrame(item);
+            }
+            shellSocket.SendMoreFrame("<IDS|MSG>");
+            shellSocket.SendMoreFrame(CreateSign(currentConnection.key,
+                                                 new List<string>() {
+                                                                 JsonSerializer.Serialize(ourHeader),
+                                                                 JsonSerializer.Serialize(parentHeader.ToDict()),
+                                                                 JsonSerializer.Serialize(metadata),
+                                                                 JsonSerializer.Serialize(content)
+                                                 }));
+            shellSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
+            shellSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
+            shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
+            shellSocket.SendFrame(JsonSerializer.Serialize(content));
+
+            //создаём временный .pas файл
+
+            //var pasPath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            //var exePath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
+            string exe = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string exeDir = System.IO.Path.GetDirectoryName(exe);
+            var pasPath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
+            var exePath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
+
             File.WriteAllText(pasPath, "uses RedirectIOMode1;\n");
             File.AppendAllText(pasPath, requestContent.code);
 
             var tempProc = new Process();
             tempProc.StartInfo.FileName = exeDir + $"\\PABCCompiler\\PABCCompiler.exe";
+            //tempProc.StartInfo.FileName = exeDir + $"\\PABCCompiler\\PABCCompilerRunner.exe";
             tempProc.StartInfo.Arguments = pasPath;
             tempProc.StartInfo.UseShellExecute = false;
             tempProc.StartInfo.CreateNoWindow = true;
             tempProc.StartInfo.RedirectStandardOutput = true;
-            tempProc.StartInfo.RedirectStandardError = true;
+            //tempProc.StartInfo.RedirectStandardError = true;
             tempProc.StartInfo.RedirectStandardInput = true;
-            tempProc.StartInfo.StandardErrorEncoding = Encoding.Default;
+            //tempProc.StartInfo.StandardErrorEncoding = Encoding.Default;
             tempProc.StartInfo.StandardInputEncoding = Encoding.Default;
             tempProc.StartInfo.StandardOutputEncoding = Encoding.Default;
+
             var isUpdate = false;
             var id = new Random().Next(1000).ToString();                                //костыль
+            bool isOk = true;
             tempProc.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
             {
-                if (e.Data != null)
-                {
-                    var dataBytes = Encoding.UTF8.GetBytes(e.Data);
-                    var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
-                    var encodedData = Encoding.Default.GetString(encodedBytes);
-                    File.Delete(pasPath);
-                    Iopub.SendDisplayData(encodedData, parentHeader, identeties, false, id);
+                if (!isOk)
                     return;
-                }
-            });
-
-            tempProc.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
-            {
-                if (e.Data != null)
+                if (e.Data != null && e.Data != "[ok]")
                 {
-                    var dataBytes = Encoding.UTF8.GetBytes(e.Data);
-                    var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
-                    var encodedData = Encoding.Default.GetString(encodedBytes);
                     File.Delete(pasPath);
-                    Iopub.SendDisplayData(encodedData, parentHeader, identeties, false, id);
-                    return;
+                    Iopub.SendDisplayData(e.Data, parentHeader, identeties, false, id);
+                    isOk = false;
                 }
             });
 
             tempProc.Start();
 
+            tempProc.BeginOutputReadLine();
+
             tempProc.WaitForExit();
 
+
+            if (!isOk)
+                return;
             if (!File.Exists(exePath))
             {
                 Iopub.SendDisplayData("Ошибка компиляции!", parentHeader, identeties, false, id);
@@ -211,7 +272,6 @@ namespace ZMQServer.Sockets
                     var encodedBytes = Encoding.Convert(Encoding.UTF8, Encoding.Default, dataBytes);
                     var encodedData = Encoding.Default.GetString(encodedBytes);
                     //Iopub.SendExecutionData(encodedData, parentHeader, identeties);
-                    
                     //Iopub.SendExecutionData(encodedData, parentHeader, identeties);
 
                     Iopub.SendDisplayData(encodedData, parentHeader, identeties, isUpdate, id);
