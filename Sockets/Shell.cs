@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using ZMQServer.Messages;
 using static ZMQServer.Server;
 
@@ -88,21 +89,51 @@ namespace ZMQServer.Sockets
             {
                 case "kernel_info_request":
                     KernelInfoRequestReply(identeties, parentHeader);
+                    Iopub.SendStatus("idle", parentHeader, identeties);
                     break;
 
                 case "execute_request":
                     var content = (ExecuteRequestContent)JsonSerializer.Deserialize(message[4], typeof(ExecuteRequestContent));
-                    ExecuteRequestReply(content, identeties, parentHeader);
+                    if (HasPlotter(content.code))
+                        ExecuteRequestReplyWithoutServer(content, identeties, parentHeader);
+                    else
+                        ExecuteRequestReply(content, identeties, parentHeader);
                     break;
                 default:
 
                     break;
             }
-            Iopub.SendStatus("idle", parentHeader, identeties);
+            //Iopub.SendStatus("idle", parentHeader, identeties);
+        }
+
+
+        private static Header currentHeader = null;
+        private static List<byte[]> currentIdenteties = null;
+        private static string currentId = null;
+        private static bool processing = false;
+        public static void TempOutput(string s)
+        {
+            if (!processing)
+                processing = true;
+            if (s == "[READLNSIGNAL]")
+            {
+                Stdin.SendInputRequest(currentHeader, currentIdenteties);
+                return;
+            }
+            if (s == "[END]")
+            {
+                processing = false;
+                Iopub.SendStatus("idle", currentHeader, currentIdenteties);
+                return;
+            }
+            Iopub.SendDisplayData(s, currentHeader, currentIdenteties, false, currentId);
         }
 
         private static void ExecuteRequestReply(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
         {
+            currentHeader = parentHeader;
+            currentIdenteties = new List<byte[]>(identeties);
+            currentId = Guid.NewGuid().ToString();
             var metadata = Dict();
             var content = Dict("status", "ok",
                                 "execution_count", ++executionCounter);
@@ -130,45 +161,27 @@ namespace ZMQServer.Sockets
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             shellSocket.SendFrame(JsonSerializer.Serialize(content));
 
-            //создаём временный .pas файл
-
-            //var pasPath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
-            //var exePath = Environment.CurrentDirectory + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
             string exe = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string exeDir = System.IO.Path.GetDirectoryName(exe);
             var pasPath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.pas";
             var exePath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
 
             var code = "uses RedirectIOMode1;\n" + requestContent.code;
-            var id = new Random().Next(1000).ToString();
-
-            Compiler.OutputHandler tempOutput;
-            tempOutput = (string s) =>
-            {
-                //if (s == "[END]")
-                //    Compiler.OutputReceived.
-                Iopub.SendDisplayData(s, parentHeader, identeties, false, id);
-            };
-
-            Compiler.OutputReceived += tempOutput;
-
             
             var compilationResult = Compiler.RequestCompilation(code);
             if (compilationResult != "[OK]")
             {
-                Iopub.SendDisplayData(compilationResult, parentHeader, identeties, false, id);
+                Iopub.SendDisplayData(compilationResult, parentHeader, identeties, false, currentId);
                 return;
             }
-
+            processing = true;
             
-            File.Delete(pasPath);
-            File.Delete(exePath);
             //TODO: Прерывать выполнение программы
             //TODO: Сервер
         }
 
 
-        private static void ExecuteRequestReply_old(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
+        private static void ExecuteRequestReplyWithoutServer(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
         {
             var metadata = Dict();
             var content = Dict("status", "ok",
@@ -305,6 +318,7 @@ namespace ZMQServer.Sockets
 
             File.Delete(pasPath);
             File.Delete(exePath);
+            Iopub.SendStatus("idle", parentHeader, identeties);
             //TODO: Прерывать выполнение программы
             //TODO: Сервер
         }
@@ -344,6 +358,13 @@ namespace ZMQServer.Sockets
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             shellSocket.SendFrame(JsonSerializer.Serialize(content));
+        }
+
+        private static bool HasPlotter(string code)
+        {
+            code = code.ToLower();
+            Regex r = new Regex(@"uses[^;]+plotter[^;]*;");
+            return r.IsMatch(code);
         }
     }
 }

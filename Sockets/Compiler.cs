@@ -15,13 +15,20 @@ namespace ZMQServer.Sockets
 {
     public static class Compiler
     {
-        public static SubscriberSocket outputSocket;
-        public static int compilerOutputPort = 5558;
-        public static string compilerOutputAddress = "tcp://127.0.0.1:" + compilerOutputPort;
+        public static PushSocket inputSocket;
+        public static int compilerInputPort = 5555;
+        //public static string compilerOutputAddress = "tcp://127.0.0.1:" + compilerOutputPort;
+        public static string compilerInputAddress = "tcp://*:" + compilerInputPort;
+
+        public static PullSocket outputSocket;
+        public static int compilerOutputPort = 5556;
+        //public static string compilerOutputAddress = "tcp://127.0.0.1:" + compilerOutputPort;
+        public static string compilerOutputAddress = "tcp://*:" + compilerOutputPort;
 
         public static RequestSocket compilerSocket;
         public static int compilerPort = 5557;
-        public static string compilerAddress = "tcp://127.0.0.1:"+compilerPort;
+        //public static string compilerAddress = "tcp://127.0.0.1:"+compilerPort;
+        public static string compilerAddress = "tcp://*:" + compilerPort;
 
         public static Thread compilerLoop = null;
         public delegate void OutputHandler(string output);
@@ -34,6 +41,8 @@ namespace ZMQServer.Sockets
             compilerLoop = new Thread(CompilerLoop);
             compilerLoop.Start();
             Logger.Log("compiler output socket started", Logger.shellFilename);
+
+            OutputReceived += Shell.TempOutput;
         }
 
         private static void CompilerLoop()
@@ -47,13 +56,16 @@ namespace ZMQServer.Sockets
 
         public static void Init()
         {
-            StartCompilerServer();
+            inputSocket = new PushSocket();
+            inputSocket.Bind(compilerInputAddress);
 
             compilerSocket = new RequestSocket();
-            compilerSocket.Connect(compilerAddress);
+            compilerSocket.Bind(compilerAddress);
 
-            outputSocket = new SubscriberSocket();
-            outputSocket.Connect(compilerOutputAddress);
+            outputSocket = new PullSocket();
+            outputSocket.Bind(compilerOutputAddress);
+
+            StartCompilerServer();
 
             //shellSocket.Bind(shellAddress);
             //ShellMessageReceived += ShellMessageProcessing;
@@ -72,11 +84,16 @@ namespace ZMQServer.Sockets
 
             compilerServerProcess = new Process();
             compilerServerProcess.StartInfo.FileName = exeDir + serverPath;
-            compilerServerProcess.StartInfo.Arguments = compilerPort.ToString() +" "+ compilerOutputPort.ToString();
+            compilerServerProcess.StartInfo.Arguments = compilerPort.ToString() +" "+ compilerOutputPort.ToString()+" "+compilerInputPort.ToString();
             compilerServerProcess.StartInfo.UseShellExecute = false;
             compilerServerProcess.StartInfo.CreateNoWindow = true;
 
             compilerServerProcess.Start();
+        }
+
+        public static void InputToCompiler(string input)
+        {
+            inputSocket.SendFrame(input);
         }
     }
 }

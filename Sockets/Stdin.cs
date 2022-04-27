@@ -106,6 +106,17 @@ namespace ZMQServer.Sockets
             var message = Encode(messageBytes);
             var content = message[4];
             var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
+            //inputStream.WriteLine(dict["value"]);
+            Compiler.InputToCompiler(dict["value"]);
+            //inputStream.Close();
+        }
+
+        private static void StdinMessageProcessing_old(List<byte[]> identeties, List<byte[]> messageBytes)
+        {
+            //inputStream = new StreamWriter(proc.StandardInput.BaseStream, Encoding.GetEncoding("cp866"));
+            var message = Encode(messageBytes);
+            var content = message[4];
+            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
             inputStream.WriteLine(dict["value"]);
             //inputStream.Close();
         }
