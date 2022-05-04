@@ -15,19 +15,21 @@ namespace ZMQServer.Sockets
 {
     public static class Compiler
     {
+        public static PushSocket heartbeatSocket;
+        public static int heartbeatPort = 5554;
+        public static string heartbeatAddress = "tcp://*:" + heartbeatPort;
+        public static Thread heartbeatLoop = null;
+
         public static PushSocket inputSocket;
         public static int compilerInputPort = 5555;
-        //public static string compilerOutputAddress = "tcp://127.0.0.1:" + compilerOutputPort;
         public static string compilerInputAddress = "tcp://*:" + compilerInputPort;
 
         public static PullSocket outputSocket;
         public static int compilerOutputPort = 5556;
-        //public static string compilerOutputAddress = "tcp://127.0.0.1:" + compilerOutputPort;
         public static string compilerOutputAddress = "tcp://*:" + compilerOutputPort;
 
         public static RequestSocket compilerSocket;
         public static int compilerPort = 5557;
-        //public static string compilerAddress = "tcp://127.0.0.1:"+compilerPort;
         public static string compilerAddress = "tcp://*:" + compilerPort;
 
         public static Thread compilerLoop = null;
@@ -40,7 +42,9 @@ namespace ZMQServer.Sockets
         {
             compilerLoop = new Thread(CompilerLoop);
             compilerLoop.Start();
-            Logger.Log("compiler output socket started", Logger.shellFilename);
+
+            heartbeatLoop = new Thread(HeartBeatLoop);
+            heartbeatLoop.Start();
 
             OutputReceived += Shell.TempOutput;
         }
@@ -51,6 +55,15 @@ namespace ZMQServer.Sockets
             {
                 var output = outputSocket.ReceiveFrameString();
                 OutputReceived?.Invoke(output);
+            }
+        }
+
+        private static void HeartBeatLoop()
+        {
+            while (true)
+            {
+                heartbeatSocket.SendFrame("[ALIVE]");
+                Thread.Sleep(1000);    
             }
         }
 
@@ -65,10 +78,10 @@ namespace ZMQServer.Sockets
             outputSocket = new PullSocket();
             outputSocket.Bind(compilerOutputAddress);
 
-            StartCompilerServer();
+            heartbeatSocket = new PushSocket();
+            heartbeatSocket.Bind(heartbeatAddress);
 
-            //shellSocket.Bind(shellAddress);
-            //ShellMessageReceived += ShellMessageProcessing;
+            StartCompilerServer();
         }
 
         public static string RequestCompilation(string code)
@@ -84,7 +97,7 @@ namespace ZMQServer.Sockets
 
             compilerServerProcess = new Process();
             compilerServerProcess.StartInfo.FileName = exeDir + serverPath;
-            compilerServerProcess.StartInfo.Arguments = compilerPort.ToString() +" "+ compilerOutputPort.ToString()+" "+compilerInputPort.ToString();
+            compilerServerProcess.StartInfo.Arguments = compilerPort.ToString() +" "+ compilerOutputPort.ToString()+" "+compilerInputPort.ToString()+" "+heartbeatPort.ToString();
             compilerServerProcess.StartInfo.UseShellExecute = false;
             compilerServerProcess.StartInfo.CreateNoWindow = true;
 
