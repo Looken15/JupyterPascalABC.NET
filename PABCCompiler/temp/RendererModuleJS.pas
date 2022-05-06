@@ -364,9 +364,6 @@ begin
   DrawCoordinates(ax_cont, fig);
   DrawCurves(ax_cont);
   DrawLegend(ax_cont);
-  
-  //if ax.TrackMouse then
-  //  OnMouseMove += ax_cont.StartPositionDraw;
 end;
 
 procedure DrawCoordinates(ac: AxesContainer; fig: Figure);
@@ -537,7 +534,7 @@ begin
         end;
       end;
       //DrawTextDC(dc,l_pos.Item1+w*0.4,cur_y,w*0.6,h1,crv[i].Name,alignment.LeftCenter,0,fnt);
-      TextOutJS(l_pos.Item1+w*0.4,cur_y,crv[i].Name,fnt);
+      TextOutJS(l_pos.Item1+w*0.4,cur_y+h1/4,crv[i].Name,fnt);
       cur_y += h1+split;
     end;
     
@@ -1250,6 +1247,7 @@ end;
 
 procedure TextOutJS(x,y:real; text: string; fnt:FontOptions);
 begin
+  y := y+TextHeightPFont(text,fnt)*0.15;
   OutputJS('cx.font = "'+ (fnt.Size/96*72) +'pt '+fnt.Name+'";'+
             'cx.fillStyle = "black";'+
             'cx.textAlign = "left";'+
