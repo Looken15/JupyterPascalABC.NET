@@ -1258,11 +1258,11 @@ end;
 procedure OutputJS(text :string);
 begin
   output.Append(text);
-  if output.Length-prevOutputCount > symbolsToOutput then
-  begin
-    Console.WriteLine(output.ToString+'</script></html>');
-    prevOutputCount := output.Length;
-  end;
+  //if output.Length-prevOutputCount > symbolsToOutput then
+  //begin
+  //  Console.WriteLine(output.ToString+'</script></html>');
+  //  prevOutputCount := output.Length;
+  //end;
 end;
 
 

@@ -94,9 +94,9 @@ namespace ZMQServer.Sockets
 
                 case "execute_request":
                     var content = (ExecuteRequestContent)JsonSerializer.Deserialize(message[4], typeof(ExecuteRequestContent));
-                    if (HasPlotter(content.code))
-                        ExecuteRequestReplyWithoutServer(content, identeties, parentHeader);
-                    else
+                    //if (HasPlotter(content.code))
+                    //    ExecuteRequestReplyWithoutServer(content, identeties, parentHeader);
+                    //else
                         ExecuteRequestReply(content, identeties, parentHeader);
                     break;
                 default:
