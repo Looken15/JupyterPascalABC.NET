@@ -364,6 +364,37 @@ begin
   DrawCoordinates(ax_cont, fig);
   DrawCurves(ax_cont);
   DrawLegend(ax_cont);
+
+  var text := 'X: 9.999 Y: 9.999';
+  var h := TextHeightPFont(text,ax_cont.NumsFont);
+  var w := TextWidthPFont(text,ax_cont.NumsFont);
+  var flag := 'false';
+  if ax.TrackMouse then
+    flag := 'true';
+  var s := 'axes.push({x:'+ax_cont.Position.Item1.ToString+','+   //position
+                      'y:'+ax_cont.Position.Item2.ToString+','+
+                      'width:'+ax_cont.Size.Item1.ToString+','+       //size
+                      'height:'+ax_cont.Size.Item2.ToString+','+
+                      'field_x:'+(ax_cont.Position.Item1+ax_cont.fborders.Item1).ToString+','+  //field position
+                      'field_y:'+(ax_cont.Position.Item2+ax_cont.fborders.Item2).ToString+','+  
+                      'field_width:'+(ax_cont.Size.Item1-2*ax_cont.fborders.Item1).ToString+','+    //field size
+                      'field_height:'+(ax_cont.Size.Item2-2*ax_cont.fborders.Item2).ToString+','+
+                      'origin_x:'+(ax_cont.Position.Item1+ax_cont.fborders.Item1).ToString+','+  //origin
+                      'origin_y:'+(ax_cont.Position.Item2+ax_cont.Size.Item2-ax_cont.fborders.Item2).ToString+','+
+                      'need_position:'+flag+','+   //need track mouse
+                      'position_x:'+(ax_cont.Position.Item1+ax_cont.Size.Item1-ax_cont.ClearableSize.Item1).ToString+','+ //position of position
+                      'position_y:'+ax_cont.Position.Item2.ToString+','+
+                      'position_width:'+ax_cont.ClearableSize.Item1.ToString+','+   //position size
+                      'position_height:'+ax_cont.ClearableSize.Item2.ToString+','+
+                      'position_font_size:'+(ax_cont.NumsFont.Size/96*72).ToString+','+
+                      'position_font_name:"'+ax_cont.NumsFont.Name+'",'+
+                      'R:'+fig.GetFacecolor.R+',G:'+fig.GetFacecolor.G+',B:'+fig.GetFacecolor.B+','
+                      'step_x:'+ax_cont.Step.Item1+',step_y:'+ax_cont.Step.Item2+','
+                      'field_origin_x:'+ax_cont.OriginXY.Item1+',field_origin_y:'+ax_cont.OriginXY.Item2+','
+                      'text_width:'+w+',text_height:'+h+
+                      '});';
+ OutputJS(s);
+ 
 end;
 
 procedure DrawCoordinates(ac: AxesContainer; fig: Figure);
