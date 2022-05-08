@@ -97,7 +97,7 @@ namespace ZMQServer.Sockets
                     //if (HasPlotter(content.code))
                     //    ExecuteRequestReplyWithoutServer(content, identeties, parentHeader);
                     //else
-                        ExecuteRequestReply(content, identeties, parentHeader);
+                    ExecuteRequestReply(content, identeties, parentHeader);
                     break;
                 default:
 
@@ -106,6 +106,9 @@ namespace ZMQServer.Sockets
             //Iopub.SendStatus("idle", parentHeader, identeties);
         }
 
+
+        public static StringBuilder resultString = new StringBuilder();
+        public static bool firstLine = true;
 
         private static Header currentHeader = null;
         private static List<byte[]> currentIdenteties = null;
@@ -122,11 +125,15 @@ namespace ZMQServer.Sockets
             }
             if (s == "[END]")
             {
+                resultString.Clear();
+                firstLine = true;
                 processing = false;
                 Iopub.SendStatus("idle", currentHeader, currentIdenteties);
                 return;
             }
-            Iopub.SendDisplayData(s, currentHeader, currentIdenteties, false, currentId);
+            resultString.Append(s + "</br>");
+            Iopub.SendDisplayData(resultString.ToString(), currentHeader, currentIdenteties, !firstLine, currentId);
+            firstLine = false;
         }
 
         private static void ExecuteRequestReply(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
@@ -167,7 +174,7 @@ namespace ZMQServer.Sockets
             var exePath = exeDir + $"\\PABCCompiler\\temp\\temp_{global_session}.exe";
 
             var code = "uses RedirectIOMode1;\n" + requestContent.code;
-            
+
             var compilationResult = Compiler.RequestCompilation(code);
             if (compilationResult != "[OK]")
             {
@@ -175,7 +182,7 @@ namespace ZMQServer.Sockets
                 return;
             }
             processing = true;
-            
+
             //TODO: Прерывать выполнение программы
             //TODO: Сервер
         }
@@ -276,7 +283,7 @@ namespace ZMQServer.Sockets
             proc.StartInfo.StandardErrorEncoding = Encoding.Default;
             proc.StartInfo.StandardInputEncoding = Encoding.Default;
             proc.StartInfo.StandardOutputEncoding = Encoding.Default;
-            
+
             proc.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
             {
                 if (e.Data != null)
@@ -289,7 +296,7 @@ namespace ZMQServer.Sockets
 
                     Iopub.SendDisplayData(encodedData, parentHeader, identeties, isUpdate, id);
                     isUpdate = true;
-                   
+
                     //Thread.Sleep(5000);
                     //Iopub.SendDisplayData("<script>var cx = document.getElementById(\"plotterCanvas\").getContext(\"2d\");" +
                     //                            "cx.fillStyle = \"rgb(255,0,0)\"" +

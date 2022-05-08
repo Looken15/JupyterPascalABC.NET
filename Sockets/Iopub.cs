@@ -163,7 +163,7 @@ namespace ZMQServer.Sockets
             iopubSocket.SendFrame(JsonSerializer.Serialize(content));
 
             SendExecutionData("", parentHeader, identeties);
-            Server.executionCounter--;
+            //Server.executionCounter--;
         }
 
     }

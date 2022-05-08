@@ -81,7 +81,7 @@ namespace ZMQServer.Sockets
             heartbeatSocket = new PushSocket();
             heartbeatSocket.Bind(heartbeatAddress);
 
-            StartCompilerServer();
+            //StartCompilerServer();
         }
 
         public static string RequestCompilation(string code)
