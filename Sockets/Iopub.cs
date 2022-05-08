@@ -31,7 +31,7 @@ namespace ZMQServer.Sockets
                                          "session", Server.global_session,
                                          "username", "username",
                                          "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
-                                         "msg_type", isUpdate?"update_display_data":"display_data",
+                                         "msg_type", isUpdate ? "update_display_data" : "display_data",
                                          "version", "5.3");
             var metadata = Server.Dict();
             var content = Server.Dict("data", Server.Dict("text/html", data),
@@ -162,7 +162,8 @@ namespace ZMQServer.Sockets
             iopubSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             iopubSocket.SendFrame(JsonSerializer.Serialize(content));
 
-            SendExecutionData("", parentHeader, identeties);
+            SendDisplayData("", parentHeader, identeties, true, Shell.currentId);
+            //SendExecutionData("", parentHeader, identeties);
             //Server.executionCounter--;
         }
 

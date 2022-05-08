@@ -112,7 +112,7 @@ namespace ZMQServer.Sockets
 
         private static Header currentHeader = null;
         private static List<byte[]> currentIdenteties = null;
-        private static string currentId = null;
+        public static string currentId = null;
         private static bool processing = false;
         public static void TempOutput(string s)
         {
@@ -131,8 +131,10 @@ namespace ZMQServer.Sockets
                 Iopub.SendStatus("idle", currentHeader, currentIdenteties);
                 return;
             }
+            if (!firstLine)
+                Iopub.ClearOutput();
             resultString.Append(s);
-            Iopub.SendDisplayData(resultString.ToString(), currentHeader, currentIdenteties, !firstLine, currentId);
+            Iopub.SendExecutionData(s, currentHeader, currentIdenteties);
             firstLine = false;
         }
 
