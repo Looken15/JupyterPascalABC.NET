@@ -1,0 +1,95 @@
+<script>
+var cx = document.getElementById("plotterCanvas").getContext("2d");
+
+/*class MyPlotAxes33 {
+	constructor(x,y,width,height,field_x, field_y, field_width, field_height, origin_x, origin_y, need_position, position_x, position_y,position_width,position_height,position_font_size,position_font_name,R,G,B){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		
+		this.field_x = field_x;
+		this.field_y = field_y;
+		this.field_width = field_width;
+		this.field_height = field_height;
+		this.origin_x = origin_x;
+		this.origin_y = origin_y;
+		
+		this.need_position = need_position;
+		
+		this.position_x = position_x;
+		this.position_y = position_y;
+		this.position_width = position_width;
+		this.position_height = position_height;
+		this.position_font_size = position_font_size;
+		this.position_font_name = position_font_name;
+		
+		this.R = R;
+		this.G = G;
+		this.B = B;
+	}
+}*/
+function writePosition(ax, x, y){
+	/*Rct(ax.position_x, ax.position_y,ax.position_width,ax.position_height,ax.R,ax.G,ax.B);*/
+	Rct(ax.x, ax.y,ax.position_width,ax.position_height,ax.R,ax.G,ax.B);
+	cx.font = ax.position_font_size+'pt '+ax.position_font_name;
+	cx.fillStyle = "black";
+	cx.textAlign = "left";
+	cx.textBaseline = "top";
+	
+	var x1 = ax.field_origin_x + (x-ax.origin_x)/ax.step_x;
+	var y1 = ax.field_origin_y + (ax.origin_y-y)/ax.step_y;
+	/*cx.fillText("X: "+x1.toFixed(3)+" Y: "+y1.toFixed(3),ax.x+ax.width-ax.text_width,ax.text_height*0.6);*/
+	cx.fillText("X: "+x1.toFixed(3)+" Y: "+y1.toFixed(3),ax.x,ax.y+ax.text_height*0.4);
+}
+var axes = [];
+
+ 
+ function getCursorPosition(canvas, event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+	
+	axes.forEach(elem =>{
+		if (x > elem.x && x < elem.x+elem.width && y > elem.y && y < elem.y+elem.height && elem.need_position == true)
+		{
+			writePosition(elem,x,y);
+		}
+	});
+}
+var cnv = document.getElementById("plotterCanvas");
+cnv.addEventListener('mousemove', function(e) {
+    getCursorPosition(cnv, e);
+});
+
+
+
+function Rct(x,y,w,h,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {
+	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";
+	cx.fillRect(x,y,w,h);
+	if (sR != null && sG != null && sB != null && width != 0){
+		cx.strokeStyle = "rgb("+sR+","+sG+","+sB+")";
+		cx.lineWidth = width;
+		cx.strokeRect(x,y,w,h);
+	}
+}
+function Lns(arr_x,arr_y,w,R,G,B) {
+	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
+	cx.lineWidth = w;
+	cx.beginPath();
+    for (let i = 1; i < arr_x.length; i++){
+		cx.moveTo(arr_x[i-1],arr_y[i-1]);
+		cx.lineTo(arr_x[i],arr_y[i]);
+	}
+	cx.stroke();
+}
+function Sct(arr_x,arr_y,r,R,G,B) {
+	cx.fillStyle = "rgb("+R+","+G+","+B+")";
+	cx.beginPath();
+    for (let i = 0; i < arr_x.length-1; i++){
+		cx.arc(arr_x[i],arr_y[i],r,0,Math.PI*2);
+		cx.moveTo(arr_x[i+1],arr_y[i+1]);
+	}
+	cx.arc(arr_x[arr_x.length-1],arr_y[arr_x.length-1],r,0,Math.PI*2);
+	cx.fill();
+}
