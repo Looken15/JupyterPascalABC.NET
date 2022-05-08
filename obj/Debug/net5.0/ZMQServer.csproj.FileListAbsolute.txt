@@ -193,3 +193,4 @@ C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQSer
 C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ref\ZMQServer.dll
 C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQServer.pdb
 C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQServer.genruntimeconfig.cache
+C:\Users\barakuda\Source\Repos\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQServer.csproj.AssemblyReference.cache

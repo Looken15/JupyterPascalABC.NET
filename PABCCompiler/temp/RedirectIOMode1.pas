@@ -26,6 +26,8 @@ type
     function peek: integer; override;
     function read_symbol: char; override;
     function ReadLine: string; override;
+    procedure writeln; override;
+    procedure write(obj: object); override;
   end;
 
 ///--
@@ -46,6 +48,18 @@ const
 var 
   ReadlnSignalSended := false;
   LastReadSymbol := #0;
+  
+//Правка вывода
+procedure __ReadSignalOISystem.writeln;
+begin
+  inherited writeln;
+  Console.WriteLine('[NEWLINE]');
+end;
+procedure __ReadSignalOISystem.write(obj: object);
+begin
+  inherited write(obj);
+  Console.WriteLine('[FAKELINE]');  
+end;
   
 procedure WriteToProcessErrorStream(text: string);
 begin

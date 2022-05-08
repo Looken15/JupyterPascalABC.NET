@@ -131,7 +131,7 @@ namespace ZMQServer.Sockets
                 Iopub.SendStatus("idle", currentHeader, currentIdenteties);
                 return;
             }
-            resultString.Append(s + "</br>");
+            resultString.Append(s);
             Iopub.SendDisplayData(resultString.ToString(), currentHeader, currentIdenteties, !firstLine, currentId);
             firstLine = false;
         }
