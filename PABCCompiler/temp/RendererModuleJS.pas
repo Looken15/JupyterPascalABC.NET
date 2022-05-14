@@ -299,7 +299,7 @@ begin
   h := 600;
   
   OutputJS('<html><canvas width="'+w+'" height="'+h+'" id="plotterCanvas"></canvas>');
-  var tmp := ReadAllText('JSBegin.txt');
+  var tmp := ReadAllText('JSPlotterBegin.txt');
   output += tmp.Replace(NewLine,' ');
   FillRectangleJS(0,0,w,h,fig.GetFacecolor);
 	

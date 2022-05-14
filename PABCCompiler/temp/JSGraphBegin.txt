@@ -1,0 +1,38 @@
+<script>
+var cx = document.getElementById("graphCanvas").getContext("2d");
+var cnv = document.getElementById("graphCanvas");
+
+function Rct(x,y,w,h,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {
+	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";
+	cx.fillRect(x,y,w,h);
+	if (sR != null && sG != null && sB != null && width != 0){
+		cx.strokeStyle = "rgb("+sR+","+sG+","+sB+")";
+		cx.lineWidth = width;
+		cx.strokeRect(x,y,w,h);
+	}
+}
+function RctS(x,y,w,h,sR,sG,sB,width) {
+	cx.strokeStyle = "rgb("+sR+","+sG+","+sB+")";
+	cx.lineWidth = width;
+	cx.strokeRect(x,y,w,h);
+}
+function Lns(arr_x,arr_y,w,R,G,B) {
+	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
+	cx.lineWidth = w;
+	cx.beginPath();
+    for (let i = 1; i < arr_x.length; i++){
+		cx.moveTo(arr_x[i-1],arr_y[i-1]);
+		cx.lineTo(arr_x[i],arr_y[i]);
+	}
+	cx.stroke();
+}
+function Sct(arr_x,arr_y,r,R,G,B) {
+	cx.fillStyle = "rgb("+R+","+G+","+B+")";
+	cx.beginPath();
+    for (let i = 0; i < arr_x.length-1; i++){
+		cx.arc(arr_x[i],arr_y[i],r,0,Math.PI*2);
+		cx.moveTo(arr_x[i+1],arr_y[i+1]);
+	}
+	cx.arc(arr_x[arr_x.length-1],arr_y[arr_x.length-1],r,0,Math.PI*2);
+	cx.fill();
+}
