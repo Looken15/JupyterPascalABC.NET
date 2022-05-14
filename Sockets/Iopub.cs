@@ -132,8 +132,11 @@ namespace ZMQServer.Sockets
 
         public static void ClearOutput()
         {
-            var identeties = Server.shellIdenteties;
-            var parentHeader = Server.shellParentHeader;
+            var identeties = Shell.currentIdenteties;
+            var parentHeader = Shell.currentHeader;
+
+            if (identeties == null)
+                return;
 
             var ourHeader = Server.Dict("msg_id", Guid.NewGuid(),
                                          "session", Server.global_session,
@@ -162,7 +165,7 @@ namespace ZMQServer.Sockets
             iopubSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             iopubSocket.SendFrame(JsonSerializer.Serialize(content));
 
-            SendDisplayData("", parentHeader, identeties, true, Shell.currentId);
+            //SendDisplayData("", parentHeader, identeties, true, Shell.currentId);
             //SendExecutionData("", parentHeader, identeties);
             //Server.executionCounter--;
         }

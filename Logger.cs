@@ -41,13 +41,20 @@ namespace ZMQServer
 
         public static void Log(string message, string filenameTo = "commonLog.txt")
         {
-            string path = logPath + filenameTo;
+            try
+            {
+                string path = logPath + filenameTo;
 
-            message = DateTime.Now + " " + message + "\n";
+                message = DateTime.Now + " " + message + "\n";
 
-            File.AppendAllText(path, message);
-            if (filenameTo != "commonLog.txt")
-                File.AppendAllText(logPath + "commonLog.txt", message);
+                File.AppendAllText(path, message);
+                if (filenameTo != "commonLog.txt")
+                    File.AppendAllText(logPath + "commonLog.txt", message);
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         public static void Log(List<string> message, string filenameTo = "commonLog.txt")

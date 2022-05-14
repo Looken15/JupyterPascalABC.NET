@@ -110,10 +110,11 @@ namespace ZMQServer.Sockets
         public static StringBuilder resultString = new StringBuilder();
         public static bool firstLine = true;
 
-        private static Header currentHeader = null;
-        private static List<byte[]> currentIdenteties = null;
+        public static Header currentHeader = null;
+        public static List<byte[]> currentIdenteties = null;
         public static string currentId = null;
         private static bool processing = false;
+        private static string lastString = "";
         public static void TempOutput(string s)
         {
             if (!processing)
@@ -125,6 +126,14 @@ namespace ZMQServer.Sockets
             }
             if (s == "[END]")
             {
+                /*  Для Jupyter Lab
+                 *  
+                //Iopub.ClearOutput();
+                //Iopub.SendDisplayData(lastString, currentHeader, currentIdenteties, true, currentId);
+                //lastString = "";
+                *
+                */
+
                 resultString.Clear();
                 firstLine = true;
                 processing = false;
@@ -134,8 +143,24 @@ namespace ZMQServer.Sockets
             if (!firstLine)
                 Iopub.ClearOutput();
             resultString.Append(s);
+
+
+            /* Для Jupyter Lab 
+             * 
+            //if (firstLine)
+            //{
+            //    Iopub.SendDisplayData(s, currentHeader, currentIdenteties, false, currentId);
+            //}
+            //Iopub.SendDisplayData(s, currentHeader, currentIdenteties, true, currentId);
+            *
+            */
+
+            //Для Jupyter Notebook
             Iopub.SendExecutionData(s, currentHeader, currentIdenteties);
+
+
             firstLine = false;
+            lastString = s;
         }
 
         private static void ExecuteRequestReply(ExecuteRequestContent requestContent, List<byte[]> identeties, Header parentHeader)
@@ -341,7 +366,7 @@ namespace ZMQServer.Sockets
                         "implementation_version", "0.0.1",
                         "language_info", Dict("name", "PascalABC.NET",
                                               "version", "1.0",
-                                              "mimetype", "html\\text",
+                                              "mimetype", "text/x-python",
                                               "file_extension", ".pas"),
                         "banner", "Hello World!");
             var ourHeader = Dict("msg_id", Guid.NewGuid(),
