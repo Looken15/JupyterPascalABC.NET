@@ -182,7 +182,7 @@ type
 //>>     Графические примитивы # GraphWPF primitives
 // -----------------------------------------------------
 /// Рисует пиксел в точке (x,y) цветом c
-//procedure SetPixel(x,y: real; c: Color);
+procedure SetPixel(x,y: real; c: Color);
 /// Рисует прямоугольник пикселей размера (w,h), задаваемых отображением f, начиная с левого верхнего угла с координатами (x,y)
 //procedure SetPixels(x,y: real; w,h: integer; f: (integer,integer)->Color);
 /// Рисует двумерный массив пикселей pixels начиная с левого верхнего угла с координатами (x,y)
@@ -191,30 +191,30 @@ type
 //procedure DrawPixels(x,y: real; pixels: array [,] of Color; px,py,pw,ph: integer);
 
 /// Рисует эллипс с центром в точке (x,y) и радиусами rx и ry
-//procedure Ellipse(x,y,rx,ry: real);
+procedure Ellipse(x,y,rx,ry: real);
 /// Рисует контур эллипса с центром в точке (x,y) и радиусами rx и ry
-//procedure DrawEllipse(x,y,rx,ry: real);
+procedure DrawEllipse(x,y,rx,ry: real);
 /// Рисует внутренность эллипса с центром в точке (x,y) и радиусами rx и ry
-//procedure FillEllipse(x,y,rx,ry: real);
+procedure FillEllipse(x,y,rx,ry: real);
 /// Рисует эллипс с центром в точке (x,y), радиусами rx и ry и цветом внутренности c
-//procedure Ellipse(x,y,rx,ry: real; c: Color);
+procedure Ellipse(x,y,rx,ry: real; c: Color);
 /// Рисует контур эллипса с центром в точке (x,y), радиусами rx и ry и цветом c
-//procedure DrawEllipse(x,y,rx,ry: real; c: Color);
+procedure DrawEllipse(x,y,rx,ry: real; c: Color);
 /// Рисует внутренность эллипса с центром в точке (x,y), радиусами rx и ry и цветом c
-//procedure FillEllipse(x,y,rx,ry: real; c: Color);
+procedure FillEllipse(x,y,rx,ry: real; c: Color);
 
 /// Рисует эллипс с центром в точке p и радиусами rx и ry
-//procedure Ellipse(p: Point; rx,ry: real);
+procedure Ellipse(p: Point; rx,ry: real);
 /// Рисует контур эллипса с центром в точке p и радиусами rx и ry
-//procedure DrawEllipse(p: Point; rx,ry: real);
+procedure DrawEllipse(p: Point; rx,ry: real);
 /// Рисует внутренность эллипса с центром в точке p и радиусами rx и ry
-//procedure FillEllipse(p: Point; rx,ry: real);
+procedure FillEllipse(p: Point; rx,ry: real);
 /// Рисует эллипс с центром в точке p, радиусами rx и ry и цветом внутренности c
-//procedure Ellipse(p: Point; rx,ry: real; c: Color);
+procedure Ellipse(p: Point; rx,ry: real; c: Color);
 /// Рисует контур эллипса с центром в точке p, радиусами rx и ry и цветом c
-//procedure DrawEllipse(p: Point; rx,ry: real; c: Color);
+procedure DrawEllipse(p: Point; rx,ry: real; c: Color);
 /// Рисует внутренность эллипса с центром в точке p, радиусами rx и ry и цветом c
-//procedure FillEllipse(p: Point; rx,ry: real; c: Color);
+procedure FillEllipse(p: Point; rx,ry: real; c: Color);
 
 /// Рисует окружность с центром в точке (x,y) и радиусом r
 //procedure Circle(x,y,r: real);
@@ -565,17 +565,35 @@ end;
 
 //////////////////////////////////
 
+procedure SetPixelJS(x,y:real; fillColor:Color);
+begin
+  OutputJS('SetP('+x.ToString('0.000') + ',' + y.ToString('0.000') + ','+ fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ');');
+end;
+
+procedure EllipseJS(x,y,rx,ry:real;fillColor, strokeColor: Color; width: real);
+begin
+  OutputJS('Elps(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + rx + ',' + ry + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ',' +
+ 					width + ',' + strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ');');
+end;
+procedure FillEllipseJS(x, y, rx, ry: real; fillColor: Color);
+begin
+  OutputJS('Elps(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + rx + ',' + ry + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ');');
+end;
+procedure StrokeEllipseJS(x, y, rx, ry: real; strokeColor: Color; width: real);
+begin
+  OutputJS('ElpsS(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + rx + ',' + ry + ',' + 
+ 					 strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B +','+width+');');
+end;
+
 procedure FillRectangleJS(x, y, w, h: real; fillColor: Color);
 begin
   OutputJS('Rct(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + w + ',' + h + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ');');
 end;
-
 procedure StrokeRectangleJS(x, y, w, h: real; strokeColor: Color; width: real);
 begin
   OutputJS('RctS(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + w + ',' + h + ',' + 
  					 strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B +','+width+');');
 end;
-
 procedure RectangleJS(x, y, w, h: real; fillColor, strokeColor: Color; width: real);
 begin
   OutputJS('Rct(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + w + ',' + h + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ',' +
@@ -640,12 +658,29 @@ end;
 
 ///---- P - primitives
 
+procedure SetPixel(x,y: real; c: Color) := SetPixelJS(x,y,c);
+
+procedure Ellipse(x,y,rx,ry: real) := EllipseJS(x,y,rx,ry,Brush.Color,Pen.Color,Pen.Width);
+procedure DrawEllipse(x,y,rx,ry: real) := StrokeEllipseJS(x,y,rx,ry,Pen.Color,Pen.Width);
+procedure FillEllipse(x,y,rx,ry: real) := FillEllipseJS(x,y,rx,ry,Brush.Color);
+procedure Ellipse(x,y,rx,ry: real; c: Color):= EllipseJS(x,y,rx,ry,c,Pen.Color,Pen.Width);
+procedure DrawEllipse(x,y,rx,ry: real; c: Color):= StrokeEllipseJS(x,y,rx,ry,c,Pen.Width);
+procedure FillEllipse(x,y,rx,ry: real; c: Color):=FillEllipseJS(x,y,rx,ry,c);
+
+procedure Ellipse(p: Point; rx,ry: real) := Ellipse(p.x,p.y,rx,ry);
+procedure DrawEllipse(p: Point; rx,ry: real):= DrawEllipse(p.x,p.y,rx,ry);
+procedure FillEllipse(p: Point; rx,ry: real):= FillEllipse(p.x,p.y,rx,ry);
+procedure Ellipse(p: Point; rx,ry: real; c: Color):= Ellipse(p.x,p.y,rx,ry,c);
+procedure DrawEllipse(p: Point; rx,ry: real; c: Color):= DrawEllipse(p.x,p.y,rx,ry,c);
+procedure FillEllipse(p: Point; rx,ry: real; c: Color):= FillEllipse(p.x,p.y,rx,ry,c);
+
 procedure Rectangle(x,y,w,h: real) := RectangleJS(x,y,w,h,Brush.Color,Pen.Color,Pen.Width);
 procedure DrawRectangle(x,y,w,h: real) := StrokeRectangleJS(x,y,w,h,Pen.Color,Pen.Width);
 procedure FillRectangle(x,y,w,h: real) := FillRectangleJS(x,y,w,h,Brush.Color);
 procedure Rectangle(x,y,w,h: real; c: GColor) := RectangleJS(x,y,w,h,c,Pen.Color,Pen.Width);
 procedure DrawRectangle(x,y,w,h: real; c: GColor) := StrokeRectangleJS(x,y,w,h,c,Pen.Width);
 procedure FillRectangle(x,y,w,h: real; c: GColor) := FillRectangleJS(x,y,w,h,c);
+
 
 
 procedure InitModule();

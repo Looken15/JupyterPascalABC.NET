@@ -2,6 +2,32 @@
 var cx = document.getElementById("graphCanvas").getContext("2d");
 var cnv = document.getElementById("graphCanvas");
 
+
+function SetP(x,y,R,G,B){
+	cx.fillStyle  = "rgb("+R+","+G+","+B+")";
+	cx.fillRect(x,y,1,1);
+}
+
+function Elps(x,y,rx,ry,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {
+	cx.beginPath();
+	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";
+	cx.ellipse(x,y,rx,ry,0,0,2 * Math.PI);
+	cx.fill();
+	if (sR != null && sG != null && sB != null && width != 0){
+		cx.strokeStyle = "rgb("+sR+","+sG+","+sB+")";
+		cx.lineWidth = width;
+		cx.stroke();
+	}
+	cx.closePath();
+}
+function ElpsS(x, y, rx, ry, R, G, B,width) {
+	cx.beginPath();
+	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
+	cx.ellipse(x,y,rx,ry,0,0,2 * Math.PI);
+	cx.stroke();
+	cx.closePath();
+}
+
 function Rct(x,y,w,h,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {
 	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";
 	cx.fillRect(x,y,w,h);
@@ -25,6 +51,7 @@ function Lns(arr_x,arr_y,w,R,G,B) {
 		cx.lineTo(arr_x[i],arr_y[i]);
 	}
 	cx.stroke();
+	cx.closePath();
 }
 function Sct(arr_x,arr_y,r,R,G,B) {
 	cx.fillStyle = "rgb("+R+","+G+","+B+")";
@@ -35,4 +62,5 @@ function Sct(arr_x,arr_y,r,R,G,B) {
 	}
 	cx.arc(arr_x[arr_x.length-1],arr_y[arr_x.length-1],r,0,Math.PI*2);
 	cx.fill();
+	cx.closePath();
 }
