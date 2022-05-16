@@ -262,53 +262,53 @@ procedure Arc(x, y, r, angle1, angle2: real);
 procedure Arc(x, y, r, angle1, angle2: real; c: Color);
 
 /// Рисует сектор окружности с центром в точке (x,y) и радиусом r, заключенный между двумя лучами, образующими углы angle1 и angle2 с осью OX
-//procedure Sector(x, y, r, angle1, angle2: real);
+procedure Sector(x, y, r, angle1, angle2: real);
 /// Рисует сектор окружности с центром в точке (x,y) и радиусом r, заключенный между двумя лучами, образующими углы angle1 и angle2 с осью OX
-//procedure Pie(x, y, r, angle1, angle2: real);
+procedure Pie(x, y, r, angle1, angle2: real);
 /// Рисует контур сектора окружности с центром в точке (x,y) и радиусом r, заключенного между двумя лучами, образующими углы angle1 и angle2 с осью OX
-//procedure DrawSector(x, y, r, angle1, angle2: real);
+procedure DrawSector(x, y, r, angle1, angle2: real);
 /// Рисует внутренность сектора окружности с центром в точке (x,y) и радиусом r, заключенного между двумя лучами, образующими углы angle1 и angle2 с осью OX
-//procedure FillSector(x, y, r, angle1, angle2: real);
+procedure FillSector(x, y, r, angle1, angle2: real);
 /// Рисует сектор окружности с центром в точке (x,y) и радиусом r, заключенный между двумя лучами, образующими углы angle1 и angle2 с осью OX, цветом c
-//procedure Sector(x, y, r, angle1, angle2: real; c: Color);
+procedure Sector(x, y, r, angle1, angle2: real; c: Color);
 /// Рисует контур сектора окружности с центром в точке (x,y) и радиусом r, заключенного между двумя лучами, образующими углы angle1 и angle2 с осью OX, цветом c
-//procedure DrawSector(x, y, r, angle1, angle2: real; c: Color);
+procedure DrawSector(x, y, r, angle1, angle2: real; c: Color);
 /// Рисует внутренность сектора окружности с центром в точке (x,y) и радиусом r, заключенного между двумя лучами, образующими углы angle1 и angle2 с осью OX, цветом c
-//procedure FillSector(x, y, r, angle1, angle2: real; c: Color);
+procedure FillSector(x, y, r, angle1, angle2: real; c: Color);
 
 /// Рисует отрезок прямой от точки (x,y) до точки (x1,y1)
-//procedure Line(x,y,x1,y1: real);
+procedure Line(x,y,x1,y1: real);
 /// Рисует отрезок прямой от точки (x,y) до точки (x1,y1) цветом c
-//procedure Line(x,y,x1,y1: real; c: Color);
+procedure Line(x,y,x1,y1: real; c: Color);
 /// Рисует отрезок прямой от точки p до точки p1
-//procedure Line(p,p1: Point);
+procedure Line(p,p1: Point);
 /// Рисует отрезок прямой от точки p до точки p1 цветом c
-//procedure Line(p,p1: Point; c: Color);
+procedure Line(p,p1: Point; c: Color);
 /// Рисует отрезки, заданные массивом пар точек 
-//procedure Lines(a: array of (Point,Point));
+procedure Lines(a: array of (Point,Point));
 /// Рисует отрезки, заданные массивом пар точек, цветом c 
-//procedure Lines(a: array of (Point,Point); c: Color);
+procedure Lines(a: array of (Point,Point); c: Color);
 /// Устанавливает текущую позицию рисования в точку (x,y)
-//procedure MoveTo(x,y: real);
+procedure MoveTo(x,y: real);
 /// Рисует отрезок от текущей позиции до точки (x,y). Текущая позиция переносится в точку (x,y)
-//procedure LineTo(x,y: real);
+procedure LineTo(x,y: real);
 /// Перемещает текущую позицию рисования на вектор (dx,dy)
-//procedure MoveRel(dx,dy: real);
+procedure MoveRel(dx,dy: real);
 /// Рисует отрезок от текущей позиции до точки, смещённой на вектор (dx,dy). Текущая позиция переносится в новую точку
-//procedure LineRel(dx,dy: real);
+procedure LineRel(dx,dy: real);
 /// Перемещает текущую позицию рисования на вектор (dx,dy)
-//procedure MoveBy(dx,dy: real);
+procedure MoveBy(dx,dy: real);
 /// Рисует отрезок от текущей позиции до точки, смещённой на вектор (dx,dy). Текущая позиция переносится в новую точку
-//procedure LineBy(dx,dy: real);
+procedure LineBy(dx,dy: real);
 ///--
-//procedure MoveOn(dx,dy: real);
+procedure MoveOn(dx,dy: real);
 ///--
-//procedure LineOn(dx,dy: real);
+procedure LineOn(dx,dy: real);
 
 /// Рисует ломаную, заданную массивом точек 
-//procedure PolyLine(points: array of Point);
+procedure PolyLine(points: array of Point);
 /// Рисует ломаную заданную массивом точек и цветом
-//procedure PolyLine(points: array of Point; c: Color);
+procedure PolyLine(points: array of Point; c: Color);
 
 /// Рисует многоугольник, заданный массивом точек 
 //procedure Polygon(points: array of Point);
@@ -605,6 +605,22 @@ begin
   OutputJS('Arc(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + angle1 + ',' + angle2 + ',' +
  					  strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ',' + width + ');');
 end;
+procedure SectorJS(x,y,r,angle1,angle2:real; fillColor,strokeColor: Color; width: real);
+begin
+  OutputJS('Sect(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + angle1 + ',' + angle2 + ',' +
+            fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ',' +
+ 					  strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ',' + width + ');');
+end;
+procedure StrokeSectorJS(x,y,r,angle1,angle2:real; strokeColor: Color; width: real);
+begin
+  OutputJS('SectS(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + angle1 + ',' + angle2 + ',' +
+ 					  strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ',' + width + ');');
+end;
+procedure FillSectorJS(x,y,r,angle1,angle2:real; fillColor:Color);
+begin
+  OutputJS('Sect(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + angle1 + ',' + angle2 + ',' +
+            fillColor.R + ',' + fillColor.G + ',' + fillColor.B +');');
+end;
 
 procedure FillRectangleJS(x, y, w, h: real; fillColor: Color);
 begin
@@ -621,27 +637,51 @@ begin
  					width + ',' + strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ');');
 end;
 
-procedure DrawLinesJS(arr_x, arr_y: List<real>; lineColor: Color; width: real);
+procedure DrawLinesJS(arr: array of (Point,Point); lineColor: Color; width: real);
 begin
-  var temp := new StringBuilder();
-  temp += 'Lns([';
-  for var i := 0 to arr_x.Count - 1 do
-    temp += arr_x[i].ToString('0.000') + ',';
-  temp += '],[';
-  for var i := 0 to arr_y.Count - 1 do
-    temp += arr_y[i].ToString('0.000') + ',';
-  temp += '],' + width + ',' + lineColor.R + ',' + lineColor.G + ',' + lineColor.B + ');';
+  var temp := new StringBuilder(); 
+  var   x1 := new StringBuilder();
+  var   y1 := new StringBuilder();
+  var   x2 := new StringBuilder();
+  var   y2 := new StringBuilder();
+  x1 += '['; x2 += '['; y1 += '['; y2 += '['; 
+  temp += 'RndLns(';
+  for var i := 0 to arr.Count - 2 do
+  begin
+    x1+=arr[i].Item1.X.ToString('0.000')+',';
+    x2+=arr[i].Item2.X.ToString('0.000')+',';
+    y1+=arr[i].Item1.Y.ToString('0.000')+',';
+    y2+=arr[i].Item2.Y.ToString('0.000')+',';
+  end;
+  x1+=arr[arr.Count - 1].Item1.X.ToString('0.000')+']';
+  y1+=arr[arr.Count - 1].Item1.Y.ToString('0.000')+']';
+  x2+=arr[arr.Count - 1].Item2.X.ToString('0.000')+']';
+  y2+=arr[arr.Count - 1].Item2.Y.ToString('0.000')+']';
+  temp += x1.ToString() +','+y1.ToString() +','+x2.ToString() +','+y2.ToString() +','+
+    width + ',' + lineColor.R + ',' + lineColor.G + ',' + lineColor.B + ');';
   OutputJS(temp.ToString);
 end;
-
-procedure DrawLineJS(x1, y1, x2, y2: real; lineColor: Color; width: real);
+procedure DrawLineJS(x1, y1, x2, y2: real; c: Color; width: real);
 begin
-  OutputJS('cx.strokeStyle = "rgb(' + lineColor.R + ',' + lineColor.G + ',' + lineColor.B + ')";' +
-            'cx.lineWidth = ' + width + ';' +
-            'cx.beginPath();' +
-            'cx.moveTo(' + x1.ToString('0.000') + ',' + y1.ToString('0.000') + ');' +
-            'cx.lineTo(' + x2.ToString('0.000') + ',' + y2.ToString('0.000') + ');' +
-            'cx.stroke();');
+  OutputJS('Lns(['+x1+','+x2+'],['+y1+','+y2+'],'+width+','+c.R+','+c.G+','+c.B+');');
+end;
+procedure DrawPolyLineJS(arr: array of Point; c: Color; width: real);
+begin
+  var temp := new StringBuilder();
+  var   x := new StringBuilder();
+  var   y := new StringBuilder();
+  x += '['; y += '[';
+  temp += 'Lns(';
+  for var i := 0 to arr.Count - 2 do
+  begin
+    x+=arr[i].X.ToString('0.000')+',';
+    y+=arr[i].Y.ToString('0.000')+',';
+  end;
+  x+=arr[arr.Count - 1].X.ToString('0.000')+']';
+  y+=arr[arr.Count - 1].Y.ToString('0.000')+']';
+  temp += x.ToString() +','+y.ToString() +','+
+    width + ',' + c.R + ',' + c.G + ',' + c.B + ');';
+  OutputJS(temp.ToString);
 end;
 
 //procedure FillCircleJS(x, y, r: real; fillColor: Color);
@@ -711,6 +751,37 @@ procedure FillCircle(p: Point; r: real; c: Color):=FillCircle(p.x,p.y,r,c);
 
 procedure Arc(x, y, r, angle1, angle2: real) := ArcJS(x,y,r,angle1,angle2,Pen.Color,Pen.Width);
 procedure Arc(x, y, r, angle1, angle2: real; c: Color):= ArcJS(x,y,r,angle1,angle2,c,Pen.Width);
+
+procedure Sector(x, y, r, angle1, angle2: real):=SectorJS(x,y,r,angle1,angle2,Brush.Color,Pen.Color,Pen.Width);
+procedure Pie(x, y, r, angle1, angle2: real):=SectorJS(x,y,r,angle1,angle2,Brush.Color,Pen.Color,Pen.Width);
+procedure DrawSector(x, y, r, angle1, angle2: real):=StrokeSectorJS(x,y,r,angle1,angle2,Pen.Color,Pen.Width);
+procedure FillSector(x, y, r, angle1, angle2: real):=FillSectorJS(x,y,r,angle1,angle2,Brush.Color);
+procedure Sector(x, y, r, angle1, angle2: real; c: Color):=SectorJS(x,y,r,angle1,angle2,c,Pen.Color,Pen.Width);
+procedure DrawSector(x, y, r, angle1, angle2: real; c: Color):=StrokeSectorJS(x,y,r,angle1,angle2,c,Pen.Width);
+procedure FillSector(x, y, r, angle1, angle2: real; c: Color):=FillSectorJS(x,y,r,angle1,angle2,c);
+
+procedure Line(x,y,x1,y1: real):=DrawLineJS(x,y,x1,y1,Pen.Color,Pen.Width);
+procedure Line(x,y,x1,y1: real; c: Color):=DrawLineJS(x,y,x1,y1,c,Pen.Width);
+procedure Line(p,p1: Point):=DrawLineJS(p.x,p.y,p1.x,p1.y,Pen.Color,Pen.Width);
+procedure Line(p,p1: Point; c: Color):=DrawLineJS(p.x,p.y,p1.x,p1.y,c,Pen.Width);
+procedure Lines(a: array of (Point,Point)):=DrawLinesJS(a,Pen.Color,Pen.Width);
+procedure Lines(a: array of (Point,Point); c: Color):=DrawLinesJS(a,c,Pen.Width);
+
+procedure MoveTo(x,y: real) := (Pen.fx,Pen.fy) := (x,y);
+procedure LineTo(x,y: real);
+begin 
+  Line(Pen.fx,Pen.fy,x,y);
+  MoveTo(x,y);
+end;
+procedure MoveRel(dx,dy: real) := (Pen.fx,Pen.fy) := (Pen.fx + dx, Pen.fy + dy);
+procedure LineRel(dx,dy: real) := LineTo(Pen.fx + dx, Pen.fy + dy);
+procedure MoveOn(dx,dy: real) := MoveRel(dx,dy);
+procedure LineOn(dx,dy: real) := LineRel(dx,dy);
+procedure MoveBy(dx,dy: real) := MoveRel(dx,dy);
+procedure LineBy(dx,dy: real) := LineRel(dx,dy);
+
+procedure PolyLine(points: array of Point):=DrawPolyLineJS(points,Pen.Color,Pen.Width);
+procedure PolyLine(points: array of Point; c: Color):=DrawPolyLineJS(points,c,Pen.Width);
 
 procedure Rectangle(x,y,w,h: real) := RectangleJS(x,y,w,h,Brush.Color,Pen.Color,Pen.Width);
 procedure DrawRectangle(x,y,w,h: real) := StrokeRectangleJS(x,y,w,h,Pen.Color,Pen.Width);
