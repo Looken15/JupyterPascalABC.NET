@@ -27,6 +27,35 @@ function ElpsS(x, y, rx, ry, R, G, B,width) {
 	cx.stroke();
 	cx.closePath();
 }
+function Crcl(x,y,r,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {
+	cx.beginPath();
+	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";
+	cx.arc(x,y,r,0, 2*Math.PI);
+	cx.fill();
+	if (sR != null && sG != null && sB != null && width != 0){
+		cx.strokeStyle = "rgb("+sR+","+sG+","+sB+")";
+		cx.lineWidth = width;
+		cx.stroke();
+	}
+	cx.closePath();
+}
+function CrclS(x,y,r,sR,sG,sB,width) {
+	cx.beginPath();
+	cx.strokeStyle = "rgb("+sR+","+sG+","+sB+")";
+	cx.lineWidth = width;
+	cx.arc(x,y,r,0, 2*Math.PI);
+	cx.stroke();
+	cx.closePath();
+}
+
+function Arc(x,y,r,angle1,angle2,R,G,B,width){
+	cx.beginPath();
+	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
+	cx.lineWidth = width;
+	cx.arc(x,y,r,angle1,angle2);
+	cx.stroke();
+	cx.closePath();
+}
 
 function Rct(x,y,w,h,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {
 	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";

@@ -217,30 +217,30 @@ procedure DrawEllipse(p: Point; rx,ry: real; c: Color);
 procedure FillEllipse(p: Point; rx,ry: real; c: Color);
 
 /// Рисует окружность с центром в точке (x,y) и радиусом r
-//procedure Circle(x,y,r: real);
+procedure Circle(x,y,r: real);
 /// Рисует контур окружности с центром в точке (x,y) и радиусом r
-//procedure DrawCircle(x,y,r: real);
+procedure DrawCircle(x,y,r: real);
 /// Рисует внутренность окружности с центром в точке (x,y) и радиусом r
-//procedure FillCircle(x,y,r: real);
+procedure FillCircle(x,y,r: real);
 /// Рисует окружность с центром в точке (x,y), радиусом r и цветом c
-//procedure Circle(x,y,r: real; c: Color);
+procedure Circle(x,y,r: real; c: Color);
 /// Рисует контур окружности с центром в точке (x,y), радиусом r и цветом c
-//procedure DrawCircle(x,y,r: real; c: Color);
+procedure DrawCircle(x,y,r: real; c: Color);
 /// Рисует внутренность окружности с центром в точке (x,y), радиусом r и цветом c
-//procedure FillCircle(x,y,r: real; c: Color);
+procedure FillCircle(x,y,r: real; c: Color);
 
 /// Рисует окружность с центром в точке p и радиусом r
-//procedure Circle(p: Point; r: real);
+procedure Circle(p: Point; r: real);
 /// Рисует контур окружности с центром в точке p и радиусом r
-//procedure DrawCircle(p: Point; r: real);
+procedure DrawCircle(p: Point; r: real);
 /// Рисует внутренность окружности с центром в точке p и радиусом r
-//procedure FillCircle(p: Point; r: real);
+procedure FillCircle(p: Point; r: real);
 /// Рисует окружность с центром в точке p, радиусом r и цветом c
-//procedure Circle(p: Point; r: real; c: Color);
+procedure Circle(p: Point; r: real; c: Color);
 /// Рисует контур окружности с центром в точке p, радиусом r и цветом c
-//procedure DrawCircle(p: Point; r: real; c: Color);
+procedure DrawCircle(p: Point; r: real; c: Color);
 /// Рисует внутренность окружности с центром в точке p, радиусом r и цветом c
-//procedure FillCircle(p: Point; r: real; c: Color);
+procedure FillCircle(p: Point; r: real; c: Color);
 
 
 /// Рисует прямоугольник с координатами вершин (x,y) и (x+w,y+h)
@@ -257,9 +257,9 @@ procedure DrawRectangle(x,y,w,h: real; c: Color);
 procedure FillRectangle(x,y,w,h: real; c: Color);
 
 /// Рисует дугу окружности с центром в точке (x,y) и радиусом r, заключенную между двумя лучами, образующими углы angle1 и angle2 с осью OX
-//procedure Arc(x, y, r, angle1, angle2: real);
+procedure Arc(x, y, r, angle1, angle2: real);
 /// Рисует дугу окружности с центром в точке (x,y) и радиусом r, заключенную между двумя лучами, образующими углы angle1 и angle2 с осью OX, цветом c
-//procedure Arc(x, y, r, angle1, angle2: real; c: Color);
+procedure Arc(x, y, r, angle1, angle2: real; c: Color);
 
 /// Рисует сектор окружности с центром в точке (x,y) и радиусом r, заключенный между двумя лучами, образующими углы angle1 и angle2 с осью OX
 //procedure Sector(x, y, r, angle1, angle2: real);
@@ -585,6 +585,27 @@ begin
  					 strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B +','+width+');');
 end;
 
+procedure CircleJS(x,y,r:real;fillColor, strokeColor: Color; width: real);
+begin
+  OutputJS('Crcl(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ',' +
+ 					width + ',' + strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ');');
+end;
+procedure FillCircleJS(x, y, r: real; fillColor: Color);
+begin
+  OutputJS('Crcl(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ');');
+end;
+procedure StrokeCircleJS(x, y, r: real; strokeColor: Color; width: real);
+begin
+  OutputJS('CrclS(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + 
+ 					 strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B +','+width+');');
+end;
+
+procedure ArcJS(x,y,r,angle1,angle2:real; strokeColor: Color; width: real);
+begin
+  OutputJS('Arc(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',' + angle1 + ',' + angle2 + ',' +
+ 					  strokeColor.R + ',' + strokeColor.G + ',' + strokeColor.B + ',' + width + ');');
+end;
+
 procedure FillRectangleJS(x, y, w, h: real; fillColor: Color);
 begin
   OutputJS('Rct(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + w + ',' + h + ',' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ');');
@@ -623,13 +644,13 @@ begin
             'cx.stroke();');
 end;
 
-procedure FillCircleJS(x, y, r: real; fillColor: Color);
-begin
-  OutputJS('cx.fillStyle = "rgb(' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ')";' +
-            'cx.beginPath();' +
-            'cx.arc(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',0,' + (Pi * 2) + ');' +
-            'cx.fill();');
-end;
+//procedure FillCircleJS(x, y, r: real; fillColor: Color);
+//begin
+//  OutputJS('cx.fillStyle = "rgb(' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ')";' +
+//            'cx.beginPath();' +
+//            'cx.arc(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',0,' + (Pi * 2) + ');' +
+//            'cx.fill();');
+//end;
 
 procedure DrawScatterJS(arr_x, arr_y: List<real>; lineColor: Color; r: real);
 begin
@@ -673,6 +694,23 @@ procedure FillEllipse(p: Point; rx,ry: real):= FillEllipse(p.x,p.y,rx,ry);
 procedure Ellipse(p: Point; rx,ry: real; c: Color):= Ellipse(p.x,p.y,rx,ry,c);
 procedure DrawEllipse(p: Point; rx,ry: real; c: Color):= DrawEllipse(p.x,p.y,rx,ry,c);
 procedure FillEllipse(p: Point; rx,ry: real; c: Color):= FillEllipse(p.x,p.y,rx,ry,c);
+
+procedure Circle(x,y,r: real) := CircleJS(x,y,r,Brush.Color,Pen.Color,Pen.Width);
+procedure DrawCircle(x,y,r: real):= StrokeCircleJS(x,y,r,Pen.Color,Pen.Width);
+procedure FillCircle(x,y,r: real):= FillCircleJS(x,y,r,Brush.Color);
+procedure Circle(x,y,r: real; c: Color):= CircleJS(x,y,r,c,Pen.Color,Pen.Width);
+procedure DrawCircle(x,y,r: real; c: Color):= StrokeCircleJS(x,y,r,c,Pen.Width);
+procedure FillCircle(x,y,r: real; c: Color):= FillCircleJS(x,y,r,c);
+
+procedure Circle(p: Point; r: real):=Circle(p.x,p.y,r);
+procedure DrawCircle(p: Point; r: real):=DrawCircle(p.x,p.y,r);
+procedure FillCircle(p: Point; r: real):=FillCircle(p.x,p.y,r);
+procedure Circle(p: Point; r: real; c: Color):=Circle(p.x,p.y,r,c);
+procedure DrawCircle(p: Point; r: real; c: Color):=DrawCircle(p.x,p.y,r,c);
+procedure FillCircle(p: Point; r: real; c: Color):=FillCircle(p.x,p.y,r,c);
+
+procedure Arc(x, y, r, angle1, angle2: real) := ArcJS(x,y,r,angle1,angle2,Pen.Color,Pen.Width);
+procedure Arc(x, y, r, angle1, angle2: real; c: Color):= ArcJS(x,y,r,angle1,angle2,c,Pen.Width);
 
 procedure Rectangle(x,y,w,h: real) := RectangleJS(x,y,w,h,Brush.Color,Pen.Color,Pen.Width);
 procedure DrawRectangle(x,y,w,h: real) := StrokeRectangleJS(x,y,w,h,Pen.Color,Pen.Width);
