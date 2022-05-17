@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj": {}
+    "G:\\myGit\\JupyterPascalABC.NET\\ZMQServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj": {
+    "G:\\myGit\\JupyterPascalABC.NET\\ZMQServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj",
+        "projectUniqueName": "G:\\myGit\\JupyterPascalABC.NET\\ZMQServer.csproj",
         "projectName": "ZMQServer",
-        "projectPath": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj",
-        "packagesPath": "C:\\Users\\barakuda\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\obj\\",
+        "projectPath": "G:\\myGit\\JupyterPascalABC.NET\\ZMQServer.csproj",
+        "packagesPath": "C:\\Users\\Pahomov.a\\.nuget\\packages\\",
+        "outputPath": "G:\\myGit\\JupyterPascalABC.NET\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\barakuda\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Pahomov.a\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -64,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.408\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,5 +1,6 @@
 {
     "argv": ["C:\\Users\\Tema-\\Desktop\\za_loop.exe", "{connection_file}"],
     "display_name": "PABC_test",
-    "language": "PABC_test"
+    "language": "pascal",
+	"interrupt_mode": "message"
 }

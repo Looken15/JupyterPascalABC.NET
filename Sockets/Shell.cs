@@ -360,7 +360,7 @@ namespace ZMQServer.Sockets
                         "protocol_version", "5.3",
                         "implementation", "jupyterPascal",
                         "implementation_version", "0.0.1",
-                        "language_info", Dict("name", "PascalABC.NET",
+                        "language_info", Dict("name", "pascal",
                                               "version", "1.0",
                                               "mimetype", "text/x-python",
                                               "file_extension", ".pas"),
