@@ -16,7 +16,8 @@ var
   step := 0.1;
 ///Размеры окна (костыль)
 var
-  w, h: real;
+  w := 800;
+  h := 600;
 ///отступы между графиками по осям X и Y
 var
   Borders := (10, 8);
@@ -31,6 +32,7 @@ var
   symbolsToOutput := 100000;
 var
   prevOutputCount := 0;
+var curOutputId := '';
 
 type
   GColor = System.Windows.Media.Color;
@@ -295,12 +297,13 @@ function GetFontFamily(name: string): FontFamily;
 procedure Show(f: Figure);
 begin
   fig := f;
-  w := 800;
-  h := 600;
-  
-  OutputJS('<html><canvas width="'+w+'" height="'+h+'" id="plotterCanvas"></canvas>');
+  curOutputId := System.DateTime.UtcNow.Ticks.ToString;
+  OutputJS('<html><canvas width="'+w+'" height="'+h+'" id="'+curOutputId+'"></canvas>');
   var tmp := ReadAllText('JSPlotterBegin.txt');
-  output += tmp.Replace(NewLine,' ');
+  output += tmp.Replace(NewLine,' ').Replace('cx','cx_'+curOutputId).Replace('writePosition','writePosition_'+curOutputId).Replace('getCursorPosition','getCursorPosition_'+curOutputId);
+  OutputJS('cx_'+curOutputId+' = document.getElementById("'+curOutputId+'").getContext("2d");');
+  OutputJS('var cnv_'+curOutputId+' = document.getElementById("'+curOutputId+'");');
+  OutputJS('cnv_'+curOutputId+'.addEventListener("mousemove", function(e){getCursorPosition_'+curOutputId+'(cnv_'+curOutputId+', e);});');
   FillRectangleJS(0,0,w,h,fig.GetFacecolor);
 	
   //FastDraw(dc -> DrawRectangleDC(dc, 0, 0, w, h, fig.GetFacecolor, EmptyColor, 1.0));
@@ -1247,20 +1250,20 @@ end;
 
 procedure DrawLineJS(x1,y1,x2,y2:real; lineColor:Color; width:real);
 begin
-   OutputJS('cx.strokeStyle = "rgb('+lineColor.R+','+lineColor.G+','+lineColor.B+')";'+
-            'cx.lineWidth = '+width+';'+
-            'cx.beginPath();'+
-            'cx.moveTo('+x1.ToString('0.000')+','+y1.ToString('0.000')+');'+
-            'cx.lineTo('+x2.ToString('0.000')+','+y2.ToString('0.000')+');'+
-            'cx.stroke();');
+   OutputJS('cx_'+curOutputId+'.strokeStyle = "rgb('+lineColor.R+','+lineColor.G+','+lineColor.B+')";'+
+            'cx_'+curOutputId+'.lineWidth = '+width+';'+
+            'cx_'+curOutputId+'.beginPath();'+
+            'cx_'+curOutputId+'.moveTo('+x1.ToString('0.000')+','+y1.ToString('0.000')+');'+
+            'cx_'+curOutputId+'.lineTo('+x2.ToString('0.000')+','+y2.ToString('0.000')+');'+
+            'cx_'+curOutputId+'.stroke();');
 end;
 
 procedure FillCircleJS(x,y,r:real; fillColor:Color);
 begin
-   OutputJS('cx.fillStyle = "rgb('+fillColor.R+','+fillColor.G+','+fillColor.B+')";'+
-            'cx.beginPath();'+
-            'cx.arc('+x.ToString('0.000')+','+y.ToString('0.000')+','+r+',0,'+(Pi*2)+');'+
-            'cx.fill();');
+   OutputJS('cx_'+curOutputId+'.fillStyle = "rgb('+fillColor.R+','+fillColor.G+','+fillColor.B+')";'+
+            'cx_'+curOutputId+'.beginPath();'+
+            'cx_'+curOutputId+'.arc('+x.ToString('0.000')+','+y.ToString('0.000')+','+r+',0,'+(Pi*2)+');'+
+            'cx_'+curOutputId+'.fill();');
 end;
 
 procedure DrawScatterJS(arr_x,arr_y:List<real>; lineColor:Color; r:real);
@@ -1279,11 +1282,11 @@ end;
 procedure TextOutJS(x,y:real; text: string; fnt:FontOptions);
 begin
   y := y+TextHeightPFont(text,fnt)*0.15;
-  OutputJS('cx.font = "'+ (fnt.Size/96*72) +'pt '+fnt.Name+'";'+
-            'cx.fillStyle = "black";'+
-            'cx.textAlign = "left";'+
-            'cx.textBaseline = "top";'+
-            'cx.fillText("'+text+'", '+x.ToString('0.000')+','+y.ToString('0.000')+');');
+  OutputJS('cx_'+curOutputId+'.font = "'+ (fnt.Size/96*72) +'pt '+fnt.Name+'";'+
+            'cx_'+curOutputId+'.fillStyle = "black";'+
+            'cx_'+curOutputId+'.textAlign = "left";'+
+            'cx_'+curOutputId+'.textBaseline = "top";'+
+            'cx_'+curOutputId+'.fillText("'+text+'", '+x.ToString('0.000')+','+y.ToString('0.000')+');');
 end;
 
 procedure OutputJS(text :string);

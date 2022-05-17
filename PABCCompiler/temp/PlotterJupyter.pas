@@ -1,4 +1,4 @@
-﻿unit Plotter;
+﻿unit PlotterJupyter;
 
 interface
 

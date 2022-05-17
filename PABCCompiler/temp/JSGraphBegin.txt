@@ -1,7 +1,5 @@
 <script>
-var cx = document.getElementById("graphCanvas").getContext("2d");
-var cnv = document.getElementById("graphCanvas");
-
+var cx = null;
 
 function SetP(x,y,R,G,B){
 	cx.fillStyle  = "rgb("+R+","+G+","+B+")";
@@ -101,10 +99,11 @@ function RctS(x,y,w,h,sR,sG,sB,width) {
 function RndLns(arrX1,arrY1,arrX2,arrY2,w,R,G,B){
 	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
 	cx.lineWidth = w;
-	for (let i = 0; i < arr_x.length; i++){
+	for (let i = 0; i < arrX1.length; i++){
 		cx.beginPath();
 		cx.moveTo(arrX1[i],arrY1[i]);
 		cx.lineTo(arrX2[i],arrY2[i]);
+		cx.stroke();
 		cx.closePath();
 	}
 }

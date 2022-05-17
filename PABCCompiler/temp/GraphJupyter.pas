@@ -25,9 +25,9 @@ var
 ///кол-во символов после которого происходит вывод
 var
   symbolsToOutput := 100000;
-
 var
   prevOutputCount := 0;
+var curOutputId := '';
 
 type
   /// Цветовые константы
@@ -798,11 +798,14 @@ begin
   
   Brush := new BrushType();
   Pen := new PenType();
+  
+  curOutputId := System.DateTime.UtcNow.Ticks.ToString;
+  OutputJS('cx = document.getElementById("'+curOutputId+'").getContext("2d");');
 end;
 
 procedure FinalizeModule();
 begin
-  var s := '<html><canvas width="'+w+'" height="'+h+'" id="graphCanvas"></canvas>';
+  var s := '<html><canvas width="'+w+'" height="'+h+'" id="'+curOutputId+'"></canvas>';
   s := s + ReadAllText('JSGraphBegin.txt');
   OutputJS('</script></html>');
   Console.WriteLine(s+output.ToString());
