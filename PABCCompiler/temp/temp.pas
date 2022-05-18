@@ -1,7 +1,8 @@
 ﻿uses GraphJupyter;
 begin
-  
-   
-   arr[0] :=(new Point(100,100),new Point(100,10));
-   arr[1] :=(new Point(20,20),new Point(200,200));
+    WindowSize(700,300);
+    Brush.Color := Colors.Black;
+    
+    FillRectangle(10,10,200,100,Colors.Red);
+    textOut(10,10,'куку');
 end.

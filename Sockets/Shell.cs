@@ -127,13 +127,13 @@ namespace ZMQServer.Sockets
             if (s == "[END]")
             {
                 ////Для Jupyter Lab
-                  
+
                 //Iopub.ClearOutput();
                 //Iopub.SendDisplayData(lastString, currentHeader, currentIdenteties, true, currentId);
                 //lastString = "";
-               
-                
 
+
+                
                 resultString.Clear();
                 firstLine = true;
                 processing = false;

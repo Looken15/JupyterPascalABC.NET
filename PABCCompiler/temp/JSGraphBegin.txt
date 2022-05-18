@@ -1,4 +1,4 @@
-<script>
+<script charset="utf-8">
 var cx = null;
 
 function SetP(x,y,R,G,B){
@@ -118,3 +118,15 @@ function Lns(arr_x,arr_y,w,R,G,B) {
 	cx.stroke();
 	cx.closePath();
 }
+function Txt(x,y,s,font,R,G,B,align,angle) {
+	cx.save();
+	cx.translate(x,y);
+	cx.rotate(angle);
+	cx.font = font;
+	cx.fillStyle = "rgb("+R+","+G+","+B+")";
+	cx.textAlign = align;
+	cx.textBaseline = "top";
+	cx.fillText(s,0,0);
+	cx.restore();
+}
+

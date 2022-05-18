@@ -389,65 +389,43 @@ function Vect(vx,vy: real): Vector;
 //procedure DrawText(x, y, w, h: real; text: string; f: FontOptions; align: Alignment; angle: real);
 
 /// Выводит строку в позицию (x,y)
-//procedure TextOut(x, y: real; text: string; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: string; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит строку в позицию (x,y) цветом c
-//procedure TextOut(x, y: real; text: string; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: string; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит целое в позицию (x,y)
-//procedure TextOut(x, y: real; text: integer; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: integer; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит целое в позицию (x,y) цветом c
-//procedure TextOut(x, y: real; text: integer; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: integer; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит вещественное в позицию (x,y)
-//procedure TextOut(x, y: real; text: real; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: real; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит вещественное в позицию (x,y) цветом c
-//procedure TextOut(x, y: real; text: real; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: real; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит строку в позицию (x,y) указанным шрифтом
-//procedure TextOut(x, y: real; text: string; f: FontOptions; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: string; f: FontOptions; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 
 /// Ширина текста при выводе
-//function TextWidth(text: string): real;
+function TextWidth(text: string): real;
 /// Высота текста при выводе
-//function TextHeight(text: string): real;
+function TextHeight(text: string): real;
 /// Размер текста при выводе
-//function TextSize(text: string): Size;
+function TextSize(text: string): Size;
 
 /// Ширина текста при выводе заданным шрифтом
-//function TextWidth(text: string; f: FontOptions): real;
+function TextWidth(text: string; f: FontOptions): real;
 /// Высота текста при выводе заданным шрифтом
-//function TextHeight(text: string; f: FontOptions): real;
+function TextHeight(text: string; f: FontOptions): real;
 /// Размер текста при выводе заданным шрифтом
-//function TextSize(text: string; f: FontOptions): Size;
+function TextSize(text: string; f: FontOptions): Size;
 
 // -----------------------------------------------------
 //>>     Переменные модуля GraphWPF # GraphWPF variables
 // -----------------------------------------------------
 /// Текущая кисть
-var Brush: BrushType;
+var Brush: BrushType := new BrushType();
 /// Текущее перо
-var Pen: PenType;
+var Pen: PenType := new PenType();
 /// Текущий шрифт
-var Font: FontOptions;
-
-
-///Шрифт по заданной ширине, высоте и тексту
-function GetFontSizeByWH(W, H: real; text: string): FontOptions;
-///Шрифт по заданной ширине и тексту
-function GetFontSizeByW(W: real; text: string): FontOptions;
-///Шрифт по заданной высоте и тексту
-function GetFontSizeByH(H: real; text: string): FontOptions;
-
-//функции генерации и вывода JS кода
-//procedure FillRectangleJS(x, y, w, h: real; fillColor: Color);
-//procedure DrawRectangleJS(x, y, w, h: real; fillColor, strokeColor: Color; width: real);
-
-//procedure DrawLineJS(x1, y1, x2, y2: real; lineColor: Color; width: real);
-//procedure DrawLinesJS(arr_x, arr_y: List<real>; lineColor: Color; width: real);
-//procedure FillCircleJS(x, y, r: real; fillColor: Color);
-//procedure DrawScatterJS(arr_x, arr_y: List<real>; lineColor: Color; r: real);
-//procedure TextOutJS(x, y: real; text: string; fnt: FontOptions);
-//procedure OutputJS(text: string);
-
-function TextWidthPFont(text: string; f: FontOptions): real;
-function TextHeightPFont(text: string; f: FontOptions): real;
+var Font: FontOptions := new FontOptions();
 
 procedure WindowSize(width, height: integer);
 
@@ -516,40 +494,42 @@ begin
   Result := new FormattedText(text,RusCultureInfo, FlowDirection.LeftToRight, Font.TypefaceClone, Font.Size, GetBrush(c));
 end;
 
-function TextWidthP(text: string) := FormText(text).Width;
-function TextHeightP(text: string) := FormText(text).Height;
+function TextWidth(text: string) := FormText(text).Width;
+function TextHeight(text: string) := FormText(text).Height;
+function TextSize(text: string) := new Size(FormText(text).Width,FormText(text).Height);
+function TextWidth(text: string; f: FontOptions) := FormTextFont(text, f).Width;
+function TextHeight(text: string; f: FontOptions):= FormTextFont(text, f).Height;
+function TextSize(text: string; f: FontOptions):= new Size(FormTextFont(text, f).Width,FormTextFont(text, f).Height);
 
-function TextWidthPFont(text: string; f: FontOptions) := FormTextFont(text, f).Width;
-function TextHeightPFont(text: string; f: FontOptions) := FormTextFont(text, f).Height;
 function GetFontSizeByW(W: real; text: string): FontOptions;
 begin
   var fnt := new FontOptions;
-  var cur_width := TextWidthPFont(text, fnt);
+  var cur_width := TextWidth(text, fnt);
   while (cur_width > w) do
   begin
     fnt.Size -= 0.1;
-    cur_width := TextWidthPFont(text, fnt);
+    cur_width := TextWidth(text, fnt);
   end;
   while (cur_width < w * 0.9) do
   begin
     fnt.Size += 0.1;
-    cur_width := TextWidthPFont(text, fnt);
+    cur_width := TextWidth(text, fnt);
   end;
   Result := fnt;
 end;
 function GetFontSizeByH(H: real; text: string): FontOptions;
 begin
   var fnt := new FontOptions;
-  var cur_height := TextHeightPFont(text, fnt);
+  var cur_height := TextHeight(text, fnt);
   while (cur_height > h) do
   begin
     fnt.Size -= 0.1;
-    cur_height := TextHeightPFont(text, fnt);
+    cur_height := TextHeight(text, fnt);
   end;
   while (cur_height < h * 0.9) do
   begin
     fnt.Size += 0.1;
-    cur_height := TextHeightPFont(text, fnt);
+    cur_height := TextHeight(text, fnt);
   end;
   Result := fnt;
 end;
@@ -684,13 +664,6 @@ begin
   OutputJS(temp.ToString);
 end;
 
-//procedure FillCircleJS(x, y, r: real; fillColor: Color);
-//begin
-//  OutputJS('cx.fillStyle = "rgb(' + fillColor.R + ',' + fillColor.G + ',' + fillColor.B + ')";' +
-//            'cx.beginPath();' +
-//            'cx.arc(' + x.ToString('0.000') + ',' + y.ToString('0.000') + ',' + r + ',0,' + (Pi * 2) + ');' +
-//            'cx.fill();');
-//end;
 
 procedure DrawScatterJS(arr_x, arr_y: List<real>; lineColor: Color; r: real);
 begin
@@ -705,14 +678,24 @@ begin
   OutputJS(temp.ToString);
 end;
 
-procedure TextOutJS(x, y: real; text: string; fnt: FontOptions);
+procedure TextOutJS(x, y: real; text: string; fnt: FontOptions; c: Color; align: Alignment;angle: real);
 begin
-  y := y + TextHeightPFont(text, fnt) * 0.15;
-  OutputJS('cx.font = "' + (fnt.Size / 96 * 72) + 'pt ' + fnt.Name + '";' +
-            'cx.fillStyle = "black";' +
-            'cx.textAlign = "left";' +
-            'cx.textBaseline = "top";' +
-            'cx.fillText("' + text + '", ' + x.ToString('0.000') + ',' + y.ToString('0.000') + ');');
+  y := y + TextHeight(text, fnt) * 0.15;
+  var f := (fnt.Size / 96 * 72) + 'pt ' + fnt.Name;
+  var align_w := '';
+  var align_h := '';
+  case align of
+    LeftTop,LeftCenter,LeftBottom: align_w := 'left';
+    RightTop,RightCenter,RightBottom: align_w := 'right';
+    CenterTop,Center,CenterBottom: align_w := 'center';
+  end;
+  case align of
+    Center,RightCenter,LeftCenter: y -= TextHeight(text, fnt)/2;
+    LeftBottom,RightBottom,CenterBottom: y -= TextHeight(text, fnt);
+  end;
+  var ft := FormText(text);
+  OutputJS('Txt('+x.ToString('0.000')+','+y.ToString('0.000')+',"'+ft.Text+'","'+f+'",'+
+            c.R+','+c.G+','+c.B+',"'+align_w+'",'+angle+');');
 end;
 
 /////////////////////////////////////////////
@@ -790,15 +773,20 @@ procedure Rectangle(x,y,w,h: real; c: GColor) := RectangleJS(x,y,w,h,c,Pen.Color
 procedure DrawRectangle(x,y,w,h: real; c: GColor) := StrokeRectangleJS(x,y,w,h,c,Pen.Width);
 procedure FillRectangle(x,y,w,h: real; c: GColor) := FillRectangleJS(x,y,w,h,c);
 
-
+procedure TextOut(x, y: real; text: string; align: Alignment; angle: real):=TextOutJS(x,y,text,Font,Font.Color,align,angle);
+procedure TextOut(x, y: real; text: string; c: GColor; align: Alignment; angle: real):=TextOutJS(x,y,text,Font,c,align,angle);
+procedure TextOut(x, y: real; text: integer; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,Font.Color,align,angle);
+procedure TextOut(x, y: real; text: integer; c: GColor; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,c,align,angle);
+procedure TextOut(x, y: real; text: real; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,Font.Color,align,angle);
+procedure TextOut(x, y: real; text: real; c: GColor; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,c,align,angle);
+procedure TextOut(x, y: real; text: string; f: FontOptions; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,f,f.Color,align,angle);
 
 procedure InitModule();
 begin
   w := 800; h := 600;
-  
+ 
   Brush := new BrushType();
   Pen := new PenType();
-  
   curOutputId := System.DateTime.UtcNow.Ticks.ToString;
   OutputJS('cx = document.getElementById("'+curOutputId+'").getContext("2d");');
 end;
@@ -806,8 +794,9 @@ end;
 procedure FinalizeModule();
 begin
   var s := '<html><canvas width="'+w+'" height="'+h+'" id="'+curOutputId+'"></canvas>';
-  s := s + ReadAllText('JSGraphBegin.txt');
+  s := s + ReadAllText('JSGraphBegin.txt').Replace(NewLine,' ');
   OutputJS('</script></html>');
+  //Console.OutputEncoding := Encoding.UTF8;
   Console.WriteLine(s+output.ToString());
 end;
 
