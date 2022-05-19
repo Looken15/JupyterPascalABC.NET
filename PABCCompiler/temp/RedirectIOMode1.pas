@@ -142,26 +142,29 @@ begin
     begin
         //if AppDomain.CurrentDomain.GetData('_RedirectIO_SpecialArgs') = nil then
         //  Console.ReadLine;
+        
         RedirectIOInDebugMode := true;
         //if IOStandardSystem(CurrentIOSystem).GetType = typeof(IOStandardSystem) then // SSM 30.04.06 - не менять! Влияет на PT4!
-          CurrentIOSystem := new __ReadSignalOISystem;        
+        CurrentIOSystem := new __ReadSignalOISystem;        
         //AppDomain.CurrentDomain.UnhandledException += DbgExceptionHandler;
         try
           AddThreadExceptionHandler;
         except
         end;
-        if not IsConsoleApplication then
-        begin
-          WriteToProcessErrorStream(string.Format(CodePageCommandTemplate, 65001)); // IB 5.08.08
-        end;
         
-        var _a := new string[_CommandLineArgs.Length-1];
-        for var i:=1 to _CommandLineArgs.Length - 1 do
-          _a[i-1] := _CommandLineArgs[i];
-        _CommandLineArgs := _a;
+        //if not IsConsoleApplication then
+        //begin
+        //  WriteToProcessErrorStream(string.Format(CodePageCommandTemplate, 65001)); // IB 5.08.08
+        //end;
         
-        Console.OutputEncoding := System.Text.Encoding.UTF8;
-        Console.InputEncoding := System.Text.Encoding.UTF8;
+        //var _a := new string[_CommandLineArgs.Length-1];
+        //for var i:=1 to _CommandLineArgs.Length - 1 do
+        //  _a[i-1] := _CommandLineArgs[i];
+        //_CommandLineArgs := _a;
+        //Console.OutputEncoding := System.Text.Encoding.UTF8;
+        //Console.InputEncoding := System.Text.Encoding.UTF8;
+        Console.OutputEncoding := System.Text.Encoding.GetEncoding(1251);
+        Console.InputEncoding := System.Text.Encoding.GetEncoding(1251);
     end;
   except
   end;

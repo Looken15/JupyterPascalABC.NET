@@ -797,7 +797,8 @@ begin
   s := s + ReadAllText('JSGraphBegin.txt').Replace(NewLine,' ');
   OutputJS('</script></html>');
   //Console.OutputEncoding := Encoding.UTF8;
-  Console.WriteLine(s+output.ToString());
+  //Console.WriteLine(s+output.ToString());
+  WriteLn(s+output.ToString());
 end;
 
 initialization
