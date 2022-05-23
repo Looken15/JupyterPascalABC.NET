@@ -11,28 +11,7 @@ uses System.Windows.Media;
 
 //uses FigureModule, AxesModule;
 
-///шаг отрисовки
-var
-  step := 0.1;
-///Размеры окна (костыль)
-var
-  w := 800;
-  h := 600;
-///отступы между графиками по осям X и Y
-var
-  Borders := (10, 8);
-///отображаемый экземпляр Figure
-var
-  fig: Figure;
-///вывод JS код
-var
-  output: StringBuilder = new StringBuilder();
-///кол-во символов после которого происходит вывод
-var
-  symbolsToOutput := 100000;
-var
-  prevOutputCount := 0;
-var curOutputId := '';
+
 
 type
   GColor = System.Windows.Media.Color;
@@ -276,7 +255,37 @@ procedure OutputJS(text :string);
 function TextWidthPFont(text: string; f: FontOptions) :real;
 function TextHeightPFont(text: string; f: FontOptions) :real;
 
+procedure NeedButtons(flag: boolean);
+
 implementation
+
+///Нужна ли отрисовка кнопок
+var drawUI := false;
+///шаг отрисовки
+var
+  step := 0.1;
+///Размеры окна (костыль)
+var
+  w := 800;
+  h := 600;
+///отступы между графиками по осям X и Y
+var
+  Borders := (10, 8);
+///отображаемый экземпляр Figure
+var
+  fig: Figure;
+///вывод JS код
+var
+  output: StringBuilder = new StringBuilder();
+///кол-во символов после которого происходит вывод
+var
+  symbolsToOutput := 100000;
+var
+  prevOutputCount := 0;
+var curOutputId := '';
+
+
+procedure NeedButtons(flag: boolean):= drawUI := flag;
 
 function GetBrush(c: GColor): GBrush := new SolidColorBrush(c);
 function ARGB(a,r,g,b: byte) := Color.FromArgb(a, r, g, b);
@@ -300,10 +309,16 @@ begin
   curOutputId := System.DateTime.UtcNow.Ticks.ToString;
   OutputJS('<html><canvas width="'+w+'" height="'+h+'" id="'+curOutputId+'"></canvas>');
   var tmp := ReadAllText('JSPlotterBegin.txt');
-  output += tmp.Replace(NewLine,' ').Replace('cx','cx_'+curOutputId).Replace('writePosition','writePosition_'+curOutputId).Replace('getCursorPosition','getCursorPosition_'+curOutputId);
-  OutputJS('cx_'+curOutputId+' = document.getElementById("'+curOutputId+'").getContext("2d");');
-  OutputJS('var cnv_'+curOutputId+' = document.getElementById("'+curOutputId+'");');
-  OutputJS('cnv_'+curOutputId+'.addEventListener("mousemove", function(e){getCursorPosition_'+curOutputId+'(cnv_'+curOutputId+', e);});');
+  output += tmp.Replace(NewLine,' ').Replace('cx','cx_'+curOutputId).
+                                     Replace('cv','cv_'+curOutputId).
+                                     Replace('writePosition','writePosition_'+curOutputId).
+                                     Replace('getCursorPosition','getCursorPosition_'+curOutputId).
+                                     Replace('downloadCnv','downloadCnv_'+curOutputId).
+                                     Replace('copyCnv','copyCnv_'+curOutputId); 
+  OutputJS('cv_'+curOutputId+' = document.getElementById("'+curOutputId+'");');
+  OutputJS('cx_'+curOutputId+' = cv_'+curOutputId+'.getContext("2d");');
+  
+  OutputJS('cv_'+curOutputId+'.addEventListener("mousemove", function(e){getCursorPosition_'+curOutputId+'(cv_'+curOutputId+', e);});');
   FillRectangleJS(0,0,w,h,fig.GetFacecolor);
 	
   //FastDraw(dc -> DrawRectangleDC(dc, 0, 0, w, h, fig.GetFacecolor, EmptyColor, 1.0));
@@ -354,7 +369,14 @@ begin
                         fig.GetAxes[k], fig);   
   end;
   OutputJS('</script></html>');
-  //WriteAllText('temp_output.html',output.ToString);
+  
+  if drawUI then
+  begin
+    var addition := ReadAllText('JSUIAddition.txt').Replace(NewLine,' ');
+    addition := addition.Replace('downloadCnv','downloadCnv_'+curOutputId).
+                         Replace('copyCnv','copyCnv_'+curOutputId);
+    OutputJS(addition);
+  end;
   Console.WriteLine(output.ToString);
 end;
 
@@ -417,17 +439,19 @@ begin
      //                 ac.LineWidth * 0.8);
 	  FillRectangleJS(x,y,size_x,size_y,fig.GetFacecolor);        
 	          
-    var fnt := ac.NumsFont;
+    
     
     if (ac.GetAxes.Title <> nil) and (ac.GetAxes.Title.Length > 0) then
     begin
-      fnt := GetFontSizeByH(y_border,ac.GetAxes.Title);
+      var fnt := GetFontSizeByH(y_border,ac.GetAxes.Title);
       var w :=TextWidthPFont(ac.GetAxes.Title,fnt);
       ac.ClearableSize := (size_x/2 - w/2, y_border*0.9);
       //TextoutDC(dc_ax,x+size_x/2-w/2,y,ac.GetAxes.Title,Alignment.LeftTop,0,fnt);
       TextOutJS(x+size_x/2-w/2,y,ac.GetAxes.Title,fnt);
     end;
     
+	var fnt := ac.NumsFont;
+	
     //Область рисования для Axes
     //DrawRectangleDC(dc_ax, ac.AbsoluteOrigin.Item1, ac.AbsoluteOrigin.Item2 - field_y, 
      //               field_x, field_y, ac.GetAxes.GetFacecolor, Colors.Black, ac.LineWidth * 0.5);

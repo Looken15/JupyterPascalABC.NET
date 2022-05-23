@@ -1,6 +1,6 @@
 <script>
 var cx = null;
-
+var cv = null;
 function writePosition(ax, x, y){
 	/*Rct(ax.x, ax.y,ax.position_width,ax.position_height,ax.R,ax.G,ax.B);*/
 	cx.fillStyle = "rgb("+ax.R+","+ax.G+","+ax.B+")";
@@ -61,4 +61,18 @@ function Sct(arr_x,arr_y,r,R,G,B) {
 	cx.fill();
 }
 
+function downloadCnv(){
+	let downloadLink = document.createElement('a');
+	downloadLink.setAttribute('download', 'PlotterJupyterImage.png');
+	let dataURL = cv.toDataURL('image/png');
+	let url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+	downloadLink.setAttribute('href',url);
+	downloadLink.click();
+}
+function copyCnv(){
+	cv.toBlob(function(blob) { 
+		const item = new ClipboardItem({ "image/png": blob });
+		navigator.clipboard.write([item]); 
+	});
+}
 

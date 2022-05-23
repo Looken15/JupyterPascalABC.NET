@@ -13,21 +13,7 @@ uses System.Windows.Media;
 
 //uses FigureModule, AxesModule;
 
-///шаг отрисовки
-var
-  step := 0.1;
-///Размеры окна (костыль)
-var
-  w, h: real;
-///вывод JS код
-var
-  output: StringBuilder = new StringBuilder();
-///кол-во символов после которого происходит вывод
-var
-  symbolsToOutput := 100000;
-var
-  prevOutputCount := 0;
-var curOutputId := '';
+
 
 type
   /// Цветовые константы
@@ -177,6 +163,8 @@ type
       Result.tf := new Typeface(GetFontFamily(name), tf.Style, tf.Weight, FontStretches.Normal);
     end;
   end;
+///Требуется ли отображение кнопок
+procedure NeedButtons(flag: boolean);
 
 // -----------------------------------------------------
 //>>     Графические примитивы # GraphWPF primitives
@@ -430,6 +418,22 @@ var Font: FontOptions := new FontOptions();
 procedure WindowSize(width, height: integer);
 
 implementation
+///Нужна ли отрисовка кнопок
+var drawUI := false;
+///Размеры окна (костыль)
+var
+  w, h: real;
+///вывод JS код
+var
+  output: StringBuilder = new StringBuilder();
+///кол-во символов после которого происходит вывод
+var
+  symbolsToOutput := 100000;
+var
+  prevOutputCount := 0;
+var curOutputId := '';
+
+procedure NeedButtons(flag: boolean):= drawUI := flag;
 
 procedure OutputJS(text: string);
 begin
@@ -784,20 +788,31 @@ procedure TextOut(x, y: real; text: string; f: FontOptions; align: Alignment; an
 procedure InitModule();
 begin
   w := 800; h := 600;
- 
   Brush := new BrushType();
   Pen := new PenType();
   curOutputId := System.DateTime.UtcNow.Ticks.ToString;
-  OutputJS('cx = document.getElementById("'+curOutputId+'").getContext("2d");');
+  OutputJS('cv_'+curOutputId+' = document.getElementById("'+curOutputId+'");');
+  OutputJS('cx_'+curOutputId+' = cv_'+curOutputId+'.getContext("2d");');
 end;
 
 procedure FinalizeModule();
 begin
   var s := '<html><canvas width="'+w+'" height="'+h+'" id="'+curOutputId+'"></canvas>';
-  s := s + ReadAllText('JSGraphBegin.txt').Replace(NewLine,' ');
+  s := s + ReadAllText('JSGraphBegin.txt').Replace(NewLine,' ').
+                        Replace('cv','cv_'+curOutputId).
+                        Replace('cx','cx_'+curOutputId).
+                        Replace('downloadCnv','downloadCnv_'+curOutputId).
+                        Replace('copyCnv','copyCnv_'+curOutputId); 
   OutputJS('</script></html>');
-  //Console.OutputEncoding := Encoding.UTF8;
-  //Console.WriteLine(s+output.ToString());
+  
+  if drawUI then
+  begin
+    var addition := ReadAllText('JSUIAddition.txt').Replace(NewLine,' ');
+    addition := addition.Replace('downloadCnv','downloadCnv_'+curOutputId).
+                         Replace('copyCnv','copyCnv_'+curOutputId);
+    OutputJS(addition);
+  end;
+
   WriteLn(s+output.ToString());
 end;
 

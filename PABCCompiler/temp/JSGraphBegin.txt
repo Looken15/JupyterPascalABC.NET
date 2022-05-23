@@ -1,5 +1,6 @@
 <script charset="utf-8">
 var cx = null;
+var cv = null;
 
 function SetP(x,y,R,G,B){
 	cx.fillStyle  = "rgb("+R+","+G+","+B+")";
@@ -50,7 +51,7 @@ function Arc(x,y,r,angle1,angle2,R,G,B,width){
 	cx.beginPath();
 	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
 	cx.lineWidth = width;
-	cx.arc(x,y,r,angle1,angle2);
+	cx.arc(x,y,r,-angle1*Math.PI/180,-angle2*Math.PI/180,true);
 	cx.stroke();
 	cx.closePath();
 }
@@ -58,7 +59,7 @@ function Sect(x,y,r,angle1,angle2,fR,fG,fB,sR = null,sG = null,sB = null,width =
 	cx.beginPath();
 	cx.fillStyle = "rgb("+fR+","+fG+","+fB+")";
 	cx.moveTo(x,y);
-	cx.arc(x,y,r,angle1, angle2);
+	cx.arc(x,y,r,-angle1*Math.PI/180, -angle2*Math.PI/180,true);
 	cx.lineTo(x,y);
 	cx.fill();
 	if (sR != null && sG != null && sB != null && width != 0){
@@ -74,7 +75,7 @@ function SectS(x,y,r,angle1,angle2,R,G,B,width){
 	cx.strokeStyle = "rgb("+R+","+G+","+B+")";
 	cx.lineWidth = width;
 	cx.moveTo(x,y);
-	cx.arc(x,y,r,angle1, angle2);
+	cx.arc(x,y,r,-angle1*Math.PI/180, -angle2*Math.PI/180,true);
 	cx.lineTo(x,y);
 	cx.stroke();
 	cx.closePath();
@@ -121,12 +122,27 @@ function Lns(arr_x,arr_y,w,R,G,B) {
 function Txt(x,y,s,font,R,G,B,align,angle) {
 	cx.save();
 	cx.translate(x,y);
-	cx.rotate(angle);
+	cx.rotate(angle*Math.PI/180);
 	cx.font = font;
 	cx.fillStyle = "rgb("+R+","+G+","+B+")";
 	cx.textAlign = align;
 	cx.textBaseline = "top";
 	cx.fillText(s,0,0);
 	cx.restore();
+}
+
+function downloadCnv(){
+	let downloadLink = document.createElement('a');
+	downloadLink.setAttribute('download', 'GraphJupyterImage.png');
+	let dataURL = cv.toDataURL('image/png');
+	let url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+	downloadLink.setAttribute('href',url);
+	downloadLink.click();
+}
+function copyCnv(){
+	cv.toBlob(function(blob) { 
+		const item = new ClipboardItem({ "image/png": blob });
+		navigator.clipboard.write([item]); 
+	});
 }
 

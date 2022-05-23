@@ -1,0 +1,4 @@
+</br>
+<button class="cnvUIButton" title="Сохранить изображение" onclick="downloadCnv()">&#128190</button>
+<button class="cnvUIButton" title="Копировать в буфер обмена" onclick="copyCnv()">&#128203</button>
+</br>

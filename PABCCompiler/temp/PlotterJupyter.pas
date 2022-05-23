@@ -19,6 +19,8 @@ function GetSubplots(rows, cols: integer): (Figure, List<Axes>);
 procedure Show(fig: Figure);
 ///Задать размеры окна
 procedure WindowSize(width, height: integer);
+///Требуется ли отображение кнопок
+procedure NeedButtons(flag: boolean);
 
 implementation
 
@@ -39,6 +41,8 @@ procedure WindowSize(width, height: integer);
 begin
   RendererModuleJS.WindowSize(width, height);
 end;
+
+procedure NeedButtons(flag: boolean):= RendererModuleJS.NeedButtons(flag);
 
 procedure Show(fig: Figure);
 begin
