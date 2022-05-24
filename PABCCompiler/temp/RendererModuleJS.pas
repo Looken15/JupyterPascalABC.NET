@@ -311,6 +311,7 @@ begin
   var tmp := ReadAllText('JSPlotterBegin.txt');
   output += tmp.Replace(NewLine,' ').Replace('cx','cx_'+curOutputId).
                                      Replace('cv','cv_'+curOutputId).
+                                     Replace('axes','axes_'+curOutputId).
                                      Replace('writePosition','writePosition_'+curOutputId).
                                      Replace('getCursorPosition','getCursorPosition_'+curOutputId).
                                      Replace('downloadCnv','downloadCnv_'+curOutputId).
@@ -396,7 +397,7 @@ begin
   var flag := 'false';
   if ax.TrackMouse then
     flag := 'true';
-  var s := 'axes.push({x:'+ax_cont.Position.Item1.ToString+','+   //position
+  var s := 'axes_'+curOutputId+'.push({x:'+ax_cont.Position.Item1.ToString+','+   //position
                       'y:'+ax_cont.Position.Item2.ToString+','+
                       'width:'+ax_cont.Size.Item1.ToString+','+       //size
                       'height:'+ax_cont.Size.Item2.ToString+','+
@@ -450,14 +451,14 @@ begin
       TextOutJS(x+size_x/2-w/2,y,ac.GetAxes.Title,fnt);
     end;
     
-	var fnt := ac.NumsFont;
-	
     //Область рисования для Axes
     //DrawRectangleDC(dc_ax, ac.AbsoluteOrigin.Item1, ac.AbsoluteOrigin.Item2 - field_y, 
      //               field_x, field_y, ac.GetAxes.GetFacecolor, Colors.Black, ac.LineWidth * 0.5);
     
     DrawRectangleJS(ac.AbsoluteOrigin.Item1,ac.AbsoluteOrigin.Item2 - field_y,
                   field_x, field_y,ac.GetAxes.GetFacecolor,Colors.Black,ac.LineWidth * 0.5);
+    
+    var fnt := ac.NumsFont;
     
     //отрисовка чёрточек и сетки
     var temp := origin.Item1 + (ac.Xnums[0] - ac.originxy.Item1) * ac.Step.Item1;
@@ -959,6 +960,7 @@ begin
     NumsFont.Size -= 0.1;
     cur_width := TextWidthPFont('' + longest_num, NumsFont);
   end;
+  
 end;
 
 procedure AxesContainer.SetNums;
