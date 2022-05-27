@@ -193,7 +193,6 @@ C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQSer
 C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ref\ZMQServer.dll
 C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQServer.pdb
 C:\Users\Tema-\Desktop\диплом\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQServer.genruntimeconfig.cache
-C:\Users\barakuda\Source\Repos\JupyterPascalABC.NET\obj\Debug\net5.0\ZMQServer.csproj.AssemblyReference.cache
 G:\myGit\JupyterPascalABC.NET\bin\Debug\net5.0\ZMQServer.exe
 G:\myGit\JupyterPascalABC.NET\bin\Debug\net5.0\ZMQServer.deps.json
 G:\myGit\JupyterPascalABC.NET\bin\Debug\net5.0\ZMQServer.runtimeconfig.json
