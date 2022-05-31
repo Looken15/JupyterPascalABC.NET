@@ -90,6 +90,13 @@ namespace ZMQServer.Sockets
                 case "kernel_info_request":
                     KernelInfoRequestReply(identeties, parentHeader);
                     Iopub.SendStatus("idle", parentHeader, identeties);
+                    Logger.Log("Idle sent!!!");
+                    break;
+
+                case "comm_info_request":
+                    CommInfoRequestReply(identeties, parentHeader);
+                    Iopub.SendStatus("idle", parentHeader, identeties);
+                    Logger.Log("Idle sent!!!");
                     break;
 
                 case "execute_request":
@@ -103,7 +110,6 @@ namespace ZMQServer.Sockets
 
                     break;
             }
-            //Iopub.SendStatus("idle", parentHeader, identeties);
         }
 
 
@@ -128,9 +134,9 @@ namespace ZMQServer.Sockets
             {
                 ////Для Jupyter Lab
 
-                //Iopub.ClearOutput();
-                //Iopub.SendDisplayData(lastString, currentHeader, currentIdenteties, true, currentId);
-                //lastString = "";
+                Iopub.ClearOutput();
+                Iopub.SendDisplayData(lastString, currentHeader, currentIdenteties, true, currentId);
+                lastString = "";
 
 
                 
@@ -140,19 +146,19 @@ namespace ZMQServer.Sockets
                 Iopub.SendStatus("idle", currentHeader, currentIdenteties);
                 return;
             }
-            if (!firstLine)
-                Iopub.ClearOutput();
-            resultString.Append(s);
+            //if (!firstLine)
+            //   Iopub.ClearOutput();
+            //resultString.Append(s);
 
 
             // Для Jupyter Lab 
-            //Iopub.SendDisplayData(s, currentHeader, currentIdenteties, !firstLine, currentId);
+            Iopub.SendDisplayData(s, currentHeader, currentIdenteties, !firstLine, currentId);
 
             
             
 
             //Для Jupyter Notebook
-            Iopub.SendExecutionData(s, currentHeader, currentIdenteties);
+            //Iopub.SendExecutionData(s, currentHeader, currentIdenteties);
 
 
             firstLine = false;
@@ -205,6 +211,7 @@ namespace ZMQServer.Sockets
                 return;
             }
             processing = true;
+            //Iopub.SendDisplayData(code, parentHeader, identeties, false, currentId);
 
             //TODO: Прерывать выполнение программы
             //TODO: Сервер
@@ -388,6 +395,38 @@ namespace ZMQServer.Sockets
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
             shellSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             shellSocket.SendFrame(JsonSerializer.Serialize(content));
+            Logger.Log("KernelInfoReply sent!!!");
+        }
+
+        private static void CommInfoRequestReply(List<byte[]> identeties, Header parentHeader)
+        {
+            var metadata = Dict();
+            var content = Dict("status", "ok",
+                            "comms", Dict());
+            var ourHeader = Dict("msg_id", Guid.NewGuid(),
+                                 "session", global_session,
+                                 "username", "username",
+                                 "date", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff"),
+                                 "msg_type", "comm_info_reply",
+                                 "version", "5.3");
+
+            foreach (var item in identeties)
+            {
+                Iopub.iopubSocket.SendMoreFrame(item);
+            }
+            Iopub.iopubSocket.SendMoreFrame("<IDS|MSG>");
+            Iopub.iopubSocket.SendMoreFrame(CreateSign(currentConnection.key,
+                                                 new List<string>() {
+                                                                 JsonSerializer.Serialize(ourHeader),
+                                                                 JsonSerializer.Serialize(parentHeader.ToDict()),
+                                                                 JsonSerializer.Serialize(metadata),
+                                                                 JsonSerializer.Serialize(content)
+                                                 }));
+            Iopub.iopubSocket.SendMoreFrame(JsonSerializer.Serialize(ourHeader));
+            Iopub.iopubSocket.SendMoreFrame(JsonSerializer.Serialize(parentHeader.ToDict()));
+            Iopub.iopubSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
+            Iopub.iopubSocket.SendFrame(JsonSerializer.Serialize(content));
+            Logger.Log("CommInfoReply sent!!!");
         }
 
         private static bool HasPlotter(string code)

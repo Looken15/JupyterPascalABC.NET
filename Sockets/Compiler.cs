@@ -92,14 +92,23 @@ namespace ZMQServer.Sockets
             return compilerSocket.ReceiveFrameString();
         }
 
-        public static void StartCompilerServer(string serverPath = "\\PABCCompiler\\ZMQServerPas.exe")
+        //public static void StartCompilerServer(string serverPath = "\\PABCCompiler\\ZMQServerPas")
+        public static void StartCompilerServer(string serverPath = "/PABCCompiler/ZMQServerPas.exe")
         {
             string exe = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string exeDir = System.IO.Path.GetDirectoryName(exe);
 
+            Logger.Log("Exe dir: " + exeDir+serverPath);
+
             compilerServerProcess = new Process();
-            compilerServerProcess.StartInfo.FileName = exeDir + serverPath;
-            compilerServerProcess.StartInfo.Arguments = compilerPort.ToString() +" "+ compilerOutputPort.ToString()+" "+compilerInputPort.ToString()+" "+heartbeatPort.ToString();
+            compilerServerProcess.StartInfo.FileName = "mono";
+            compilerServerProcess.StartInfo.WorkingDirectory = exeDir + "/PABCCompiler";
+            //compilerServerProcess.StartInfo.FileName = exeDir + serverPath;
+            compilerServerProcess.StartInfo.Arguments = exeDir + serverPath + " " + compilerPort.ToString() + " " + compilerOutputPort.ToString() +
+                                                        " " + compilerInputPort.ToString() + " " + heartbeatPort.ToString();
+
+            Logger.Log("With args: " + exeDir + serverPath + " "+ compilerServerProcess.StartInfo.Arguments);
+
             compilerServerProcess.StartInfo.UseShellExecute = false;
             compilerServerProcess.StartInfo.CreateNoWindow = true;
 

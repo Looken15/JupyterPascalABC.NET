@@ -17,8 +17,13 @@ namespace ZMQServer
         static void Main(string[] args)
         {
             Logger.Init();
+            if (args.Length != 1)
+            {
+                Logger.Log("no arguments!");
+                Environment.Exit(0);
+            }
+            Server server = new(args[0]);
 
-            Server server = new();
             server.StartLoops();
         }
     }

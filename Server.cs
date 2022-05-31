@@ -72,15 +72,16 @@ namespace ZMQServer
         public static Header shellParentHeader;
 
 
-        public Server()
+        public Server(string connectionFile)
         {
             global_session = Guid.NewGuid();
 
-            connectionFilePath = Directory.GetFiles(runtimePath, "kernel*")
-                                .Select(x => new { path = x, creationTime = File.GetCreationTime(x) })
-                                .OrderByDescending(x => x.creationTime)
-                                .First()
-                                .path;
+            //connectionFilePath = Directory.GetFiles(runtimePath, "kernel*")
+            //                    .Select(x => new { path = x, creationTime = File.GetCreationTime(x) })
+            //                    .OrderByDescending(x => x.creationTime)
+            //                    .First()
+            //                    .path;
+            connectionFilePath = connectionFile;
 
             Logger.Log(connectionFilePath, "123.txt");
 
