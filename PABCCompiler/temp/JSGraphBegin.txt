@@ -119,11 +119,23 @@ function Lns(arr_x,arr_y,w,R,G,B) {
 	cx.stroke();
 	cx.closePath();
 }
-function Txt(x,y,s,font,R,G,B,align,angle) {
+
+function GetTextSize(text){
+	let metrics = cx.measureText(text);
+	let h = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+	return {width:metrics.width,height:h};
+}
+
+function Txt(x,y,s,font,R,G,B,align,align_h,angle) {
 	cx.save();
+	cx.font = font;
+	y += GetTextSize(s).height*0.05;
+	if (align_h == "center")
+		y -= GetTextSize(s).height/2;
+	else if (align_h == "bottom")
+		y -= GetTextSize(s).height;
 	cx.translate(x,y);
 	cx.rotate(angle*Math.PI/180);
-	cx.font = font;
 	cx.fillStyle = "rgb("+R+","+G+","+B+")";
 	cx.textAlign = align;
 	cx.textBaseline = "top";

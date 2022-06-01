@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "QlYxByCu3m0NvcrGX/tt1rZgWjpfRk70ZJYxZ+f4qVEwBb3kZ4lJsZ05/W4ktMMliiCvNICRbxg8fFiPExoKlg==",
+  "dgSpecHash": "1vIW21v0C3oKs1jXYxl9RxRo8Gv0etJoAwaj1wEIKx1IDE2gfTLYSkq7jOaZ7g7F7egqfa+e8IRrr0jt08NoAQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\barakuda\\Source\\Repos\\JupyterPascalABC.NET\\ZMQServer.csproj",
+  "projectFilePath": "C:\\Users\\barakuda\\source\\repos\\JupyterPascalABC.NET\\ZMQServer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\barakuda\\.nuget\\packages\\asyncio\\0.1.69\\asyncio.0.1.69.nupkg.sha512",
     "C:\\Users\\barakuda\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\5.0.0\\microsoft.bcl.asyncinterfaces.5.0.0.nupkg.sha512",

@@ -2,170 +2,232 @@
 
 interface
 
-{$reference 'PresentationCore.dll'}
-{$reference 'PresentationFramework.dll'}
-{$reference 'WindowsBase.dll'}
-
-{$apptype windows}
-uses System.Windows;
-uses System.Windows.Media;
+//{$reference 'PresentationCore.dll'}
+//{$reference 'PresentationFramework.dll'}
+//{$reference 'WindowsBase.dll'}
 
 
-//uses FigureModule, AxesModule;
+ ///цвет
+type
+  Color = record
+  public
+     R:byte := 255;
+     G:byte := 255;
+     B:byte := 255;
+     A:byte := 255;
+    
+    constructor Create(r,g,b:byte; a:byte := 255);
+    begin
+      Self.R := r;
+      Self.G := g;
+      Self.B := b;
+      Self.A := a;
+    end;
+  end;
+  
+  ///основные цветовые константы
+type
+  Colors = static class
+  public
+    static IndianRed := new Color(205, 92, 92);
+    static LightCoral := new Color(240, 128, 128);
+    static Salmon := new Color(250, 128, 114);
+    static DarkSalmon := new Color(233, 150, 122);
+    static LightSalmon := new Color(255, 160, 122);
+    static Crimson := new Color(220, 20, 60);
+    static Red := new Color(255, 0, 0);
+    static FireBrick := new Color(178, 34, 34);
+    static DarkRed := new Color(139, 0, 0);
+    static Pink := new Color(255, 192, 203);
+    static LightPink := new Color(255, 182, 193);
+    static HotPink := new Color(255, 105, 180);
+    static DeepPink := new Color(255, 20, 147);
+    static MediumVioletRed := new Color(199, 21, 133);
+    static PaleVioletRed := new Color(219, 112, 147);
+    static Coral := new Color(255, 127, 80);
+    static Tomato := new Color(255, 99, 71);
+    static OrangeRed := new Color(255, 69, 0);
+    static DarkOrange := new Color(255, 140, 0);
+    static Orange := new Color(255, 165, 0);
+    static Gold := new Color(255, 215, 0);
+    static Yellow := new Color(255, 255, 0);
+    static LightYellow := new Color(255, 255, 224);
+    static LemonChiffon := new Color(255, 250, 205);
+    static LightGoldenrodYellow := new Color(250, 250, 210);
+    static PapayaWhip := new Color(255, 239, 213);
+    static Moccasin := new Color(255, 228, 181);
+    static PeachPuff := new Color(255, 218, 185);
+    static PaleGoldenrod := new Color(238, 232, 170);
+    static Khaki := new Color(240, 230, 140);
+    static DarkKhaki := new Color(189, 183, 107);
+    static Lavender := new Color(230, 230, 250);
+    static Thistle := new Color(216, 191, 216);
+    static Plum := new Color(221, 160, 221);
+    static Violet := new Color(238, 130, 238);
+    static Orchid := new Color(218, 112, 214);
+    static Fuchsia := new Color(255, 0, 255);
+    static Magenta := new Color(255, 0, 255);
+    static MediumOrchid := new Color(186, 85, 211);
+    static MediumPurple := new Color(147, 112, 219);
+    static BlueViolet := new Color(138, 43, 226);
+    static DarkViolet := new Color(148, 0, 211);
+    static DarkOrchid := new Color(153, 50, 204);
+    static DarkMagenta := new Color(139, 0, 139);
+    static Purple := new Color(128, 0, 128);
+    static Indigo := new Color(75, 0, 130);
+    static SlateBlue := new Color(106, 90, 205);
+    static DarkSlateBlue := new Color(72, 61, 139);
+    static Cornsilk := new Color(255, 248, 220);
+    static BlanchedAlmond := new Color(255, 235, 205);
+    static Bisque := new Color(255, 228, 196);
+    static NavajoWhite := new Color(255, 222, 173);
+    static Wheat := new Color(245, 222, 179);
+    static BurlyWood := new Color(222, 184, 135);
+    static Tan := new Color(210, 180, 140);
+    static RosyBrown := new Color(188, 143, 143);
+    static SandyBrown := new Color(244, 164, 96);
+    static Goldenrod := new Color(218, 165, 32);
+    static DarkGoldenRod := new Color(184, 134, 11);
+    static Peru := new Color(205, 133, 63);
+    static Chocolate := new Color(210, 105, 30);
+    static SaddleBrown := new Color(139, 69, 19);
+    static Sienna := new Color(160, 82, 45);
+    static Brown := new Color(165, 42, 42);
+    static Maroon := new Color(128, 0, 0);
+    static Black := new Color(0, 0, 0);
+    static Gray := new Color(128, 128, 128);
+    static Silver := new Color(192, 192, 192);
+    static White := new Color(255, 255, 255);
+    static Olive := new Color(128, 128, 0);
+    static Lime := new Color(0, 255, 0);
+    static Green := new Color(0, 128, 0);
+    static Aqua := new Color(0, 255, 255);
+    static Teal := new Color(0, 128, 128);
+    static Blue := new Color(0, 0, 255);
+    static Navy := new Color(0, 0, 128);
+    static GreenYellow := new Color(173, 255, 47);
+    static Chartreuse := new Color(127, 255, 0);
+    static LawnGreen := new Color(124, 252, 0);
+    static LimeGreen := new Color(50, 205, 50);
+    static PaleGreen := new Color(152, 251, 152);
+    static LightGreen := new Color(144, 238, 144);
+    static MediumSpringGreen := new Color(0, 250, 154);
+    static SpringGreen := new Color(0, 255, 127);
+    static MediumSeaGreen := new Color(60, 179, 113);
+    static SeaGreen := new Color(46, 139, 87);
+    static ForestGreen := new Color(34, 139, 34);
+    static DarkGreen := new Color(0, 100, 0);
+    static YellowGreen := new Color(154, 205, 50);
+    static OliveDrab := new Color(107, 142, 35);
+    static DarkOliveGreen := new Color(85, 107, 47);
+    static MediumAquamarine := new Color(102, 205, 170);
+    static DarkSeaGreen := new Color(143, 188, 143);
+    static LightSeaGreen := new Color(32, 178, 170);
+    static DarkCyan := new Color(0, 139, 139);
+    static Cyan := new Color(0, 255, 255);
+    static LightCyan := new Color(224, 255, 255);
+    static PaleTurquoise := new Color(175, 238, 238);
+    static Aquamarine := new Color(127, 255, 212);
+    static Turquoise := new Color(64, 224, 208);
+    static MediumTurquoise := new Color(72, 209, 204);
+    static DarkTurquoise := new Color(0, 206, 209);
+    static CadetBlue := new Color(95, 158, 160);
+    static SteelBlue := new Color(70, 130, 180);
+    static LightSteelBlue := new Color(176, 196, 222);
+    static PowderBlue := new Color(176, 224, 230);
+    static LightBlue := new Color(173, 216, 230);
+    static SkyBlue := new Color(135, 206, 235);
+    static LightSkyBlue := new Color(135, 206, 250);
+    static DeepSkyBlue := new Color(0, 191, 255);
+    static DodgerBlue := new Color(30, 144, 255);
+    static CornflowerBlue := new Color(100, 149, 237);
+    static MediumSlateBlue := new Color(123, 104, 238);
+    static RoyalBlue := new Color(65, 105, 225);
+    static MediumBlue := new Color(0, 0, 205);
+    static DarkBlue := new Color(0, 0, 139);
+    static MidnightBlue := new Color(25, 25, 112);
+    static Snow := new Color(255, 250, 250);
+    static Honeydew := new Color(240, 255, 240);
+    static MintCream := new Color(245, 255, 250);
+    static Azure := new Color(240, 255, 255);
+    static AliceBlue := new Color(240, 248, 255);
+    static GhostWhite := new Color(248, 248, 255);
+    static WhiteSmoke := new Color(245, 245, 245);
+    static Seashell := new Color(255, 245, 238);
+    static Beige := new Color(245, 245, 220);
+    static OldLace := new Color(253, 245, 230);
+    static FloralWhite := new Color(255, 250, 240);
+    static Ivory := new Color(255, 255, 240);
+    static AntiqueWhite := new Color(250, 235, 215);
+    static Linen := new Color(250, 240, 230);
+    static LavenderBlush := new Color(255, 240, 245);
+    static MistyRose := new Color(255, 228, 225);
+    static Gainsboro := new Color(220, 220, 220);
+    static LightGrey := new Color(211, 211, 211);
+    static LightGray := new Color(211, 211, 211);
+    static DarkGray := new Color(169, 169, 169);
+    static DarkGrey := new Color(169, 169, 169);
+    static Grey := new Color(128, 128, 128);
+    static DimGray := new Color(105, 105, 105);
+    static DimGrey := new Color(105, 105, 105);
+    static LightSlateGray := new Color(119, 136, 153);
+    static LightSlateGrey := new Color(119, 136, 153);
+    static SlateGray := new Color(112, 128, 144);
+    static SlateGrey := new Color(112, 128, 144);
+    static DarkSlateGray := new Color(47, 79, 79);
+    static DarkSlateGrey := new Color(47, 79, 79);
 
-
+  end;
 
 type
-  /// Цветовые константы
-  Colors = System.Windows.Media.Colors;
-  /// Тип цвета
-  Color = System.Windows.Media.Color;
-  /// Тип цвета
-  GColor = System.Windows.Media.Color;
-  /// Тип прямоугольника
-  GRect = System.Windows.Rect;
-  /// Тип окна
-  GPen = System.Windows.Media.Pen;
   /// Тип точки
-  Point = System.Windows.Point;
-  /// Тип точки
-  GPoint = System.Windows.Point;
-  /// Тип вектора
-  Vector = System.Windows.Vector;
-  /// Тип кисти
-  GBrush = System.Windows.Media.Brush;
-  /// Тип стиля шрифта
-  FontStyle = (Normal, Bold, Italic, BoldItalic);
-  
-  FontStyles = System.Windows.FontStyles;
-  FontWeights = System.Windows.FontWeights;
-  FontStretches = System.Windows.FontStretches;
-  FlowDirection = System.Windows.FlowDirection;
+  Point = class
+    X :real;
+    Y :real;
+    constructor Create(x,y:real);
+    begin
+      self.X := x;
+      self.Y := y;
+    end;
+  end;
   
   /// Константы выравнивания текста относительно точки
   Alignment = (LeftTop, CenterTop, RightTop, LeftCenter, Center, RightCenter, LeftBottom, CenterBottom, RightBottom);
 
-function GetFontFamily(name: string): FontFamily;
-function GetBrush(c: GColor): GBrush;
-
 type
-
-  ///!#
   /// Тип кисти
   BrushType = class
-  private
-    c := Colors.White;
-    function BrushConstruct := GetBrush(c);
-  public  
-    /// Цвет кисти
-    property Color: GColor read c write c;
+  public
+    Color :Color:= Colors.White;
+    constructor Create(c: GraphJupyter.Color);
+    begin
+      self.Color :=c;
+    end;
   end;
   
   ///!#
   /// Тип пера
   PenType = class
-  private
-    c: Color := Colors.Black;
-    th: real := 1;
-    fx,fy: real;
+  public
+    Color: Color := Colors.Black;
+    Width: real := 1;
+    X: real := 0.0;
+    Y: real := 0.0;
     rc: boolean := false;
-    function PenConstruct: GPen;
-    begin
-      Result := new GPen(GetBrush(c),th);
-      Result.LineJoin := PenLineJoin.Round;
-      if rc then 
-      begin
-        Result.StartLineCap := PenLineCap.Round;
-        Result.EndLineCap := PenLineCap.Round;
-      end
-      else
-      begin
-        Result.StartLineCap := PenLineCap.Flat;
-        Result.EndLineCap := PenLineCap.Flat;
-      end;
-    end;
-  public  
-    /// Цвет пера
-    property Color: GColor read c write c;
-    /// Ширина пера
-    property Width: real read th write th;
-    /// Текущая координата X пера
-    property X: real read fx;
-    /// Текущая координата Y пера
-    property Y: real read fy;
     /// Скругление пера на концах линий
     property RoundCap: boolean read rc write rc;
   end;
 
-  ///!#
   /// Тип шрифта
   FontOptions = class
-  private
-    tf := new Typeface('Arial');
-    sz: real := 14;
-    c: GColor := Colors.Black;
-    procedure SetNameP(s: string) := tf := new Typeface(GetFontFamily(s), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal); 
-    function GetName := tf.FontFamily.ToString;
-    //procedure SetName(s: string) := Invoke(SetNameP,s);
-    procedure SetFSP(fs: FontStyle);
-    begin
-      var s := FontStyles.Normal;
-      var w := FontWeights.Normal;
-      case fs of
-        FontStyle.Bold: w := FontWeights.Bold;
-        FontStyle.Italic: s := FontStyles.Italic;
-        FontStyle.BoldItalic: begin s := FontStyles.Italic; w := FontWeights.Bold; end;
-      end;
-      //tf := new Typeface(GetFontFamily(Name),s,w,FontStretches.Normal); 
-    end;
-    //procedure SetFS(fs: FontStyle) := Invoke(SetFSP,fs);
-    property BrushClone: GBrush read GetBrush(c);
-    property TypefaceClone: Typeface read tf;
   public
-    /// Цвет шрифта
-    property Color: GColor read c write c;
-    /// Имя шрифта
-    property Name: string read GetName;
-    /// Размер шрифта в единицах по 1/96 дюйма
-    property Size: real read sz write sz;
-    /// Стиль шрифта
-    //property Style: FontStyle write SetFS;
-    /// Декоратор стиля шрифта
-    function WithStyle(fs: FontStyle): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.sz := sz;
-      Result.Color := c;
-      //Result.Style := fs;
-    end;
-    /// Декоратор цвета шрифта
-    function WithColor(c: GColor): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.tf := tf;
-      Result.sz := sz;
-      Result.Color := c;
-    end;
-    /// Декоратор размера шрифта
-    function WithSize(sz: real): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.tf := tf;
-      Result.sz := sz;
-      Result.Color := c;
-    end;
-    /// Декоратор стиля шрифта
-    function WithName(name: string): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.sz := sz;
-      Result.Color := c;
-      Result.tf := new Typeface(GetFontFamily(name), tf.Style, tf.Weight, FontStretches.Normal);
-    end;
+    Name: string := 'Arial';
+    Color: Color := Colors.Black;
+    Size: real := 13;
   end;
+
 ///Требуется ли отображение кнопок
 procedure NeedButtons(flag: boolean);
-
 // -----------------------------------------------------
 //>>     Графические примитивы # GraphWPF primitives
 // -----------------------------------------------------
@@ -321,30 +383,16 @@ procedure PolyLine(points: array of Point; c: Color);
 function RGB(r,g,b: byte): Color;
 /// Возвращает цвет по красной, зеленой и синей составляющей и параметру прозрачности (в диапазоне 0..255)
 function ARGB(a,r,g,b: byte): Color;
-/// Возвращает серый цвет с интенсивностью b
-function GrayColor(b: byte): Color;
 /// Возвращает случайный цвет
 function RandomColor: Color;
 /// Возвращает полностью прозрачный цвет
 function EmptyColor: Color;
 /// Возвращает случайный цвет
 function clRandom: Color;
-/// Возвращает точку с координатами (x,y)
-function Pnt(x,y: real): GPoint;
-/// Возвращает прямоугольник с координатами угла (x,y), шириной w и высотой h
-function Rect(x,y,w,h: real): GRect;
-/// Возвращает однотонную цветную кисть, заданную цветом
-function ColorBrush(c: Color): GBrush;
-/// Возвращает однотонное цветное перо, заданное цветом
-function ColorPen(c: Color): GPen;
-/// Возвращает однотонное цветное перо, заданное цветом и толщиной
-function ColorPen(c: Color; w: real): GPen;
 /// Функция генерации случайной точки в границах экрана. Необязательный параметр w задаёт минимальный отступ от границы
 function RandomPoint(wd: real := 0): Point;
 /// Функция генерации массива случайных точек в границах экрана. Необязательный параметр w задаёт минимальный отступ от границы
 function RandomPoints(n: integer; w: real := 0): array of Point;
-/// Создаёт вектор с координатами vx,vy
-function Vect(vx,vy: real): Vector;
 
 // -----------------------------------------------------
 //>>     Функции для вывода текста # GraphWPF text functions
@@ -377,21 +425,28 @@ function Vect(vx,vy: real): Vector;
 //procedure DrawText(x, y, w, h: real; text: string; f: FontOptions; align: Alignment; angle: real);
 
 /// Выводит строку в позицию (x,y)
-procedure TextOut(x, y: real; text: string; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: string);
+procedure TextOut(x, y: real; text: string; align: Alignment; angle: real := 0.0);
 /// Выводит строку в позицию (x,y) цветом c
-procedure TextOut(x, y: real; text: string; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: string; c: Color);
+procedure TextOut(x, y: real; text: string; c: Color; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит целое в позицию (x,y)
+procedure TextOut(x, y: real; text: integer);
 procedure TextOut(x, y: real; text: integer; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит целое в позицию (x,y) цветом c
-procedure TextOut(x, y: real; text: integer; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: integer; c: Color);
+procedure TextOut(x, y: real; text: integer; c: Color; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит вещественное в позицию (x,y)
+procedure TextOut(x, y: real; text: real);
 procedure TextOut(x, y: real; text: real; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит вещественное в позицию (x,y) цветом c
-procedure TextOut(x, y: real; text: real; c: GColor; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
+procedure TextOut(x, y: real; text: real; c: Color);
+procedure TextOut(x, y: real; text: real; c: Color; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 /// Выводит строку в позицию (x,y) указанным шрифтом
+procedure TextOut(x, y: real; text: string; f: FontOptions);
 procedure TextOut(x, y: real; text: string; f: FontOptions; align: Alignment := Alignment.LeftTop; angle: real := 0.0);
 
-/// Ширина текста при выводе
+{/// Ширина текста при выводе
 function TextWidth(text: string): real;
 /// Высота текста при выводе
 function TextHeight(text: string): real;
@@ -403,7 +458,7 @@ function TextWidth(text: string; f: FontOptions): real;
 /// Высота текста при выводе заданным шрифтом
 function TextHeight(text: string; f: FontOptions): real;
 /// Размер текста при выводе заданным шрифтом
-function TextSize(text: string; f: FontOptions): Size;
+function TextSize(text: string; f: FontOptions): Size;}
 
 // -----------------------------------------------------
 //>>     Переменные модуля GraphWPF # GraphWPF variables
@@ -416,6 +471,7 @@ var Pen: PenType := new PenType();
 var Font: FontOptions := new FontOptions();
 
 procedure WindowSize(width, height: integer);
+
 
 implementation
 ///Нужна ли отрисовка кнопок
@@ -440,33 +496,12 @@ begin
   output.Append(text);
 end;
 
-function GetBrush(c: GColor): GBrush := new SolidColorBrush(c);
-
-var
-  FontFamiliesDict := new Dictionary<string, FontFamily>;
-
-function GetFontFamily(name: string): FontFamily;
-begin
-  if not (name in FontFamiliesDict) then
-  begin
-    var b := new FontFamily(name);
-    FontFamiliesDict[name] := b;
-    Result := b
-  end
-  else Result := FontFamiliesDict[name];
-end;
-
-function RGB(r,g,b: byte) := Color.Fromrgb(r, g, b);
-function ARGB(a,r,g,b: byte) := Color.FromArgb(a, r, g, b);
-function GrayColor(b: byte): Color := RGB(b, b, b);
+function RGB(r,g,b: byte) := new Color(r, g, b);
+function ARGB(a,r,g,b: byte) := new Color(r, g, b, a);
 function RandomColor := RGB(PABCSystem.Random(256), PABCSystem.Random(256), PABCSystem.Random(256));
 function EmptyColor: Color := ARGB(0,0,0,0);
 function clRandom := RandomColor();
 function Pnt(x,y: real) := new Point(x,y);
-function Rect(x,y,w,h: real) := new System.Windows.Rect(x,y,w,h);
-function ColorBrush(c: Color) := GetBrush(c);
-function ColorPen(c: Color) := new GPen(GetBrush(c),Pen.Width);
-function ColorPen(c: Color; w: real) := new GPen(GetBrush(c),w);
 function RandomPoint(wd: real): Point := Pnt(Random(wd,w-wd),Random(wd,h-wd));
 function RandomPoints(n: integer; w: real): array of Point;
 begin
@@ -474,77 +509,11 @@ begin
   foreach var i in 0..n-1 do
     Result[i] := RandomPoint(w);
 end;
-function Vect(vx,vy: real): Vector := new Vector(vx,vy);
 
 procedure WindowSize(width, height: integer);
 begin
   w := width;
   h := height;
-end;
-
-var
-  RusCultureInfo := new System.Globalization.CultureInfo('ru-ru');
-  
-function FormText(text: string) := 
-  new FormattedText(text, RusCultureInfo, FlowDirection.LeftToRight, 
-                    Font.tf, Font.Size, Font.BrushClone);                   
-function FormTextFont(text: string; f: FontOptions): FormattedText;
-begin
-  var tf := new Typeface(GetFontFamily(f.Name), f.tf.Style, f.tf.Weight, f.tf.Stretch);
-  Result := new FormattedText(text, RusCultureInfo, FlowDirection.LeftToRight, tf, f.Size, f.BrushClone);
-end;
-function FormTextC(text: string; c: GColor): FormattedText;
-begin 
-  Result := new FormattedText(text,RusCultureInfo, FlowDirection.LeftToRight, Font.TypefaceClone, Font.Size, GetBrush(c));
-end;
-
-function TextWidth(text: string) := FormText(text).Width;
-function TextHeight(text: string) := FormText(text).Height;
-function TextSize(text: string) := new Size(FormText(text).Width,FormText(text).Height);
-function TextWidth(text: string; f: FontOptions) := FormTextFont(text, f).Width;
-function TextHeight(text: string; f: FontOptions):= FormTextFont(text, f).Height;
-function TextSize(text: string; f: FontOptions):= new Size(FormTextFont(text, f).Width,FormTextFont(text, f).Height);
-
-function GetFontSizeByW(W: real; text: string): FontOptions;
-begin
-  var fnt := new FontOptions;
-  var cur_width := TextWidth(text, fnt);
-  while (cur_width > w) do
-  begin
-    fnt.Size -= 0.1;
-    cur_width := TextWidth(text, fnt);
-  end;
-  while (cur_width < w * 0.9) do
-  begin
-    fnt.Size += 0.1;
-    cur_width := TextWidth(text, fnt);
-  end;
-  Result := fnt;
-end;
-function GetFontSizeByH(H: real; text: string): FontOptions;
-begin
-  var fnt := new FontOptions;
-  var cur_height := TextHeight(text, fnt);
-  while (cur_height > h) do
-  begin
-    fnt.Size -= 0.1;
-    cur_height := TextHeight(text, fnt);
-  end;
-  while (cur_height < h * 0.9) do
-  begin
-    fnt.Size += 0.1;
-    cur_height := TextHeight(text, fnt);
-  end;
-  Result := fnt;
-end;
-function GetFontSizeByWH(W, H: real; text: string): FontOptions;
-begin
-  var Hfont := GetFontSizeByH(h, text);
-  var Wfont := GetFontSizeByW(h, text);
-  if Hfont.Size < Wfont.Size then
-    Result := Hfont
-  else
-    Result := Wfont;
 end;
 
 //////////////////////////////////
@@ -667,8 +636,6 @@ begin
     width + ',' + c.R + ',' + c.G + ',' + c.B + ');';
   OutputJS(temp.ToString);
 end;
-
-
 procedure DrawScatterJS(arr_x, arr_y: List<real>; lineColor: Color; r: real);
 begin
   var temp := new StringBuilder();
@@ -684,22 +651,21 @@ end;
 
 procedure TextOutJS(x, y: real; text: string; fnt: FontOptions; c: Color; align: Alignment;angle: real);
 begin
-  y := y + TextHeight(text, fnt) * 0.15;
+  //y := y + TextHeight(text, fnt) * 0.15;
   var f := (fnt.Size / 96 * 72) + 'pt ' + fnt.Name;
   var align_w := '';
-  var align_h := '';
   case align of
     LeftTop,LeftCenter,LeftBottom: align_w := 'left';
     RightTop,RightCenter,RightBottom: align_w := 'right';
     CenterTop,Center,CenterBottom: align_w := 'center';
   end;
+  var align_h := 'top';
   case align of
-    Center,RightCenter,LeftCenter: y -= TextHeight(text, fnt)/2;
-    LeftBottom,RightBottom,CenterBottom: y -= TextHeight(text, fnt);
+    Center,RightCenter,LeftCenter: align_h := 'center';//y -= TextHeight(text, fnt)/2;
+    LeftBottom,RightBottom,CenterBottom: align_h := 'bottom';//y -= TextHeight(text, fnt);
   end;
-  var ft := FormText(text);
-  OutputJS('Txt('+x.ToString('0.000')+','+y.ToString('0.000')+',"'+ft.Text+'","'+f+'",'+
-            c.R+','+c.G+','+c.B+',"'+align_w+'",'+angle+');');
+  OutputJS('Txt('+x.ToString('0.000')+','+y.ToString('0.000')+',"'+text+'","'+f+'",'+
+            c.R+','+c.G+','+c.B+',"'+align_w+'","'+align_h+'",'+angle+');');
 end;
 
 /////////////////////////////////////////////
@@ -754,14 +720,14 @@ procedure Line(p,p1: Point; c: Color):=DrawLineJS(p.x,p.y,p1.x,p1.y,c,Pen.Width)
 procedure Lines(a: array of (Point,Point)):=DrawLinesJS(a,Pen.Color,Pen.Width);
 procedure Lines(a: array of (Point,Point); c: Color):=DrawLinesJS(a,c,Pen.Width);
 
-procedure MoveTo(x,y: real) := (Pen.fx,Pen.fy) := (x,y);
+procedure MoveTo(x,y: real) := (Pen.X,Pen.Y) := (x,y);
 procedure LineTo(x,y: real);
 begin 
-  Line(Pen.fx,Pen.fy,x,y);
+  Line(Pen.X,Pen.Y,x,y);
   MoveTo(x,y);
 end;
-procedure MoveRel(dx,dy: real) := (Pen.fx,Pen.fy) := (Pen.fx + dx, Pen.fy + dy);
-procedure LineRel(dx,dy: real) := LineTo(Pen.fx + dx, Pen.fy + dy);
+procedure MoveRel(dx,dy: real) := (Pen.X,Pen.Y) := (Pen.X + dx, Pen.Y + dy);
+procedure LineRel(dx,dy: real) := LineTo(Pen.X + dx, Pen.Y + dy);
 procedure MoveOn(dx,dy: real) := MoveRel(dx,dy);
 procedure LineOn(dx,dy: real) := LineRel(dx,dy);
 procedure MoveBy(dx,dy: real) := MoveRel(dx,dy);
@@ -773,16 +739,23 @@ procedure PolyLine(points: array of Point; c: Color):=DrawPolyLineJS(points,c,Pe
 procedure Rectangle(x,y,w,h: real) := RectangleJS(x,y,w,h,Brush.Color,Pen.Color,Pen.Width);
 procedure DrawRectangle(x,y,w,h: real) := StrokeRectangleJS(x,y,w,h,Pen.Color,Pen.Width);
 procedure FillRectangle(x,y,w,h: real) := FillRectangleJS(x,y,w,h,Brush.Color);
-procedure Rectangle(x,y,w,h: real; c: GColor) := RectangleJS(x,y,w,h,c,Pen.Color,Pen.Width);
-procedure DrawRectangle(x,y,w,h: real; c: GColor) := StrokeRectangleJS(x,y,w,h,c,Pen.Width);
-procedure FillRectangle(x,y,w,h: real; c: GColor) := FillRectangleJS(x,y,w,h,c);
+procedure Rectangle(x,y,w,h: real; c: Color) := RectangleJS(x,y,w,h,c,Pen.Color,Pen.Width);
+procedure DrawRectangle(x,y,w,h: real; c: Color) := StrokeRectangleJS(x,y,w,h,c,Pen.Width);
+procedure FillRectangle(x,y,w,h: real; c: Color) := FillRectangleJS(x,y,w,h,c);
 
+procedure TextOut(x, y: real; text: string):=TextOutJS(x,y,text,Font,Font.Color,Alignment.LeftTop,0.0);
 procedure TextOut(x, y: real; text: string; align: Alignment; angle: real):=TextOutJS(x,y,text,Font,Font.Color,align,angle);
-procedure TextOut(x, y: real; text: string; c: GColor; align: Alignment; angle: real):=TextOutJS(x,y,text,Font,c,align,angle);
+procedure TextOut(x, y: real; text: string; c: Color):=TextOutJS(x,y,text,Font,c,Alignment.LeftTop,0.0);
+procedure TextOut(x, y: real; text: string; c: Color; align: Alignment; angle: real):=TextOutJS(x,y,text,Font,c,align,angle);
+procedure TextOut(x, y: real; text: integer):=TextOutJS(x,y,text.ToString,Font,Font.Color,Alignment.LeftTop,0.0);
 procedure TextOut(x, y: real; text: integer; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,Font.Color,align,angle);
-procedure TextOut(x, y: real; text: integer; c: GColor; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,c,align,angle);
+procedure TextOut(x, y: real; text: integer; c: Color):=TextOutJS(x,y,text.ToString,Font,c,Alignment.LeftTop,0.0);
+procedure TextOut(x, y: real; text: integer; c: Color; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,c,align,angle);
+procedure TextOut(x, y: real; text: real):=TextOutJS(x,y,text.ToString,Font,Font.Color,Alignment.LeftTop,0.0);
 procedure TextOut(x, y: real; text: real; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,Font.Color,align,angle);
-procedure TextOut(x, y: real; text: real; c: GColor; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,c,align,angle);
+procedure TextOut(x, y: real; text: real; c: Color):=TextOutJS(x,y,text.ToString,Font,c,Alignment.LeftTop,0.0);
+procedure TextOut(x, y: real; text: real; c: Color; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,Font,c,align,angle);
+procedure TextOut(x, y: real; text: string; f: FontOptions):=TextOutJS(x,y,text.ToString,f,f.Color,Alignment.LeftTop,0.0);
 procedure TextOut(x, y: real; text: string; f: FontOptions; align: Alignment; angle: real):=TextOutJS(x,y,text.ToString,f,f.Color,align,angle);
 
 procedure InitModule();

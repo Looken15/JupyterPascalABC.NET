@@ -1,5 +1,4 @@
-﻿uses RedirectIOMode1;
-uses GraphJupyter;
+﻿uses GraphJupyter;
 begin
     WindowSize(700,300);
     Brush.Color := Colors.Black;
@@ -34,5 +33,6 @@ begin
     TextOut(100,150,'hello',Alignment.RightTop);
     TextOut(200,150,'hello',Alignment.RightCenter);
     TextOut(300,150,'hello',Alignment.RightBottom);
-    textOut(10,10,'куку');
+    
+    TextOut(400,30,'Текст под углом 30 градусов!',Alignment.LeftTop,30);
 end.

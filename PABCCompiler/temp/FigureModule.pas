@@ -2,11 +2,13 @@
 
 interface 
 
-uses AxesModule, System.Windows.Media;
+uses AxesModule;
 
 type
   Axes = AxesModule.Axes;
   Curve = AxesModule.Curve;
+  Color = AxesModule.Color;
+  Colors = AxesModule.Colors;
 
 ///Класс области размещения графиков
 type Figure = class

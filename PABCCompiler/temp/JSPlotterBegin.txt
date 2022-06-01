@@ -2,7 +2,6 @@
 var cx = null;
 var cv = null;
 function writePosition(ax, x, y){
-	/*Rct(ax.x, ax.y,ax.position_width,ax.position_height,ax.R,ax.G,ax.B);*/
 	cx.fillStyle = "rgb("+ax.R+","+ax.G+","+ax.B+")";
 	cx.fillRect(ax.x,ax.y,ax.position_width,ax.position_height);
 	
@@ -13,7 +12,7 @@ function writePosition(ax, x, y){
 	
 	var x1 = ax.field_origin_x + (x-ax.origin_x)/ax.step_x;
 	var y1 = ax.field_origin_y + (ax.origin_y-y)/ax.step_y;
-	cx.fillText("X: "+x1.toFixed(3)+" Y: "+y1.toFixed(3),ax.x,ax.y+ax.text_height*0.4);
+	cx.fillText("X: "+x1.toFixed(3)+" Y: "+y1.toFixed(3),ax.x,ax.y+ax.position_height*0.1);
 }
 var axes = [];
 
@@ -31,6 +30,98 @@ var axes = [];
 			writePosition(elem,x,y);
 		}
 	});
+}
+
+function GetTextSize(text){
+	let metrics = cx.measureText(text);
+	let h = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+	return {width:metrics.width,height:h};
+}
+
+function SetPositionFontSize(){
+	axes.forEach(elem =>{
+		elem.position_font_size = GetSizeByWH("X: 99999.999 Y: 99999.999",elem.position_font_name,
+												elem.width/3,elem.position_height*0.5);
+	});
+}
+
+function GetSizeByWH(text,fnt_name,w,h){
+	let size = h;
+	cx.font = size.toString()+'pt '+fnt_name;
+	let cur_height = GetTextSize(text).height;
+	while (cur_height > h)
+	{
+		size -= 0.1; cx.font = size+'pt '+fnt_name;
+		cur_height = GetTextSize(text).height;
+	}
+	while (cur_height < 0.9*h)
+	{
+		size += 0.1; cx.font = size+'pt '+fnt_name;
+		cur_height = GetTextSize(text).height;
+	}
+	
+	let cur_width = GetTextSize(text).width;
+	while (cur_width > w)
+	{
+		size -= 0.1; cx.font = size+'pt '+fnt_name;
+		cur_width = GetTextSize(text).width;
+	}
+	while (cur_width < 0.9*w)
+	{
+		size += 0.1; cx.font = size+'pt '+fnt_name;
+		cur_width = GetTextSize(text).width;
+	}
+	return size;
+} 
+
+function SetAxesNumsSize(x,y,fxnums,fynums, x_border, y_border, fnt_name) {
+	let size1 = y_border;
+	
+	cx.font = size1.toString()+'pt '+fnt_name;
+
+	let cur_height = GetTextSize(fxnums[0].toString()).height;
+	while (cur_height > y_border * 0.7) 
+	{
+		size1 -= 0.1; cx.font = size1+'pt '+fnt_name;
+		cur_height = GetTextSize(fxnums[0].toString()).height;
+	}
+	while (cur_height < y_border * 0.6) 
+	{
+		size1 += 0.1; cx.font = size1+'pt '+fnt_name;
+		cur_height = GetTextSize(fxnums[0].toString()).height;
+	}
+
+	let longest_num = fynums[fynums.length - 1];
+	if (GetTextSize(longest_num.toString()).width < GetTextSize(fynums[0].toString()).width) 
+		longest_num = fynums[0];
+
+	let cur_width = GetTextSize(longest_num.toString()).width;
+
+	while (cur_width > x_border * 0.7) 
+	{
+		size1 -= 0.1; cx.font = size1+'pt '+fnt_name;
+		cur_width = GetTextSize(longest_num.toString()).width;
+	}
+	
+	axes.forEach(elem =>{
+		if (x == elem.x && y == elem.y)
+			elem.position_font_size = size1;
+	});
+}
+
+function Txt(x,y,text,align_x,align_y,fnt = null,R = null, G = null, B = null){
+	cx.fillStyle = "black";
+	if (fnt != null)
+	{
+		cx.font = fnt;
+		cx.fillStyle = "rgb("+R+","+G+","+B+")";
+	}
+	if (align_y == "center")
+		y -= GetTextSize(text).height*0.7;
+	cx.textAlign = align_x;
+	cx.textBaseline = "top";
+	y = y+GetTextSize(text).height*0.15;
+	cx.fillText(text,x,y);
 }
 
 function Rct(x,y,w,h,fR,fG,fB,width = 0,sR = null,sG = null,sB = null) {

@@ -3,96 +3,22 @@
 interface
 
 uses FigureModule, AxesModule;
-{$reference 'PresentationCore.dll'}
-
-{$apptype windows}
-uses System.Windows;
-uses System.Windows.Media;
-
-//uses FigureModule, AxesModule;
-
-
 
 type
-  GColor = System.Windows.Media.Color;
-  GBrush = System.Windows.Media.Brush;
+  Color = AxesModule.Color;
+  Colors = AxesModule.Colors;
   
-function GetFontFamily(name: string): FontFamily;
 function EmptyColor: Color;
-function GetBrush(c: GColor): GBrush;
 
 type
-  FontStyle = (Normal,Bold,Italic,BoldItalic);
-  FontStyles = System.Windows.FontStyles;
-  FontWeights = System.Windows.FontWeights;
-  FontStretches = System.Windows.FontStretches;
-  FlowDirection = System.Windows.FlowDirection;
-  
   /// Тип шрифта
   FontOptions = class
-  private
-    tf := new Typeface('Arial');
-    sz: real := 14;
-    c: GColor := Colors.Black;
-    procedure SetNameP(s: string) := tf := new Typeface(GetFontFamily(s),FontStyles.Normal,FontWeights.Normal,FontStretches.Normal); 
-    function GetName := tf.FontFamily.ToString;
-    //procedure SetName(s: string) := Invoke(SetNameP,s);
-    procedure SetFSP(fs: FontStyle);
-    begin
-      var s := FontStyles.Normal;
-      var w := FontWeights.Normal;
-      case fs of
-    FontStyle.Bold: w := FontWeights.Bold;
-    FontStyle.Italic: s := FontStyles.Italic;
-    FontStyle.BoldItalic: begin s := FontStyles.Italic; w := FontWeights.Bold; end;
-      end;
-      //tf := new Typeface(GetFontFamily(Name),s,w,FontStretches.Normal); 
-    end;
-    //procedure SetFS(fs: FontStyle) := Invoke(SetFSP,fs);
-    property BrushClone: GBrush read GetBrush(c);
-    property TypefaceClone: Typeface read tf;
   public
-    /// Цвет шрифта
-    property Color: GColor read c write c;
-    /// Имя шрифта
-    property Name: string read GetName;
-    /// Размер шрифта в единицах по 1/96 дюйма
-    property Size: real read sz write sz;
-    /// Стиль шрифта
-    //property Style: FontStyle write SetFS;
-    /// Декоратор стиля шрифта
-    function WithStyle(fs: FontStyle): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.sz := sz;
-      Result.Color := c;
-      //Result.Style := fs;
-    end;
-    /// Декоратор цвета шрифта
-    function WithColor(c: GColor): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.tf := tf;
-      Result.sz := sz;
-      Result.Color := c;
-    end;
-    /// Декоратор размера шрифта
-    function WithSize(sz: real): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.tf := tf;
-      Result.sz := sz;
-      Result.Color := c;
-    end;
-    /// Декоратор стиля шрифта
-    function WithName(name: string): FontOptions;
-    begin
-      Result := new FontOptions;
-      Result.sz := sz;
-      Result.Color := c;
-      Result.tf := new Typeface(GetFontFamily(name),tf.Style,tf.Weight,FontStretches.Normal);
-    end;
+    Name: string := 'Arial';
+    Color: Color := Colors.Black;
+    Size: real := 10;
   end;
+
   ///контейнер для позиционирования графика
   AxesContainer = class
   private
@@ -124,7 +50,7 @@ type
     fclearablesize: (real, real);
     
     ///Расчёт размера шрифта на осях
-    procedure SetNumSize;
+    //procedure SetNumSize;
     ///Подбор числа для отсчёта сетки 
     function FindFineNumber: (real, real);
     ///Расчёт чисел на осях
@@ -190,7 +116,8 @@ type
       Init(x, y, size_x, size_y, ax);
       AxesNumberMultiplier;
       SetNums;
-      SetNumSize;
+      //SetNumSize;
+      NumsFont := new FontOptions;
       SetSpaces;
     end;
     
@@ -235,13 +162,6 @@ procedure DrawScatterGraph(ac: AxesContainer; ind: integer);
 ///Отрисовка столбчатого графика
 procedure DrawBarGraph(ac: AxesContainer; ind: integer);
 
-///Шрифт по заданной ширине, высоте и тексту
-function GetFontSizeByWH(W, H: real; text: string): FontOptions;
-///Шрифт по заданной ширине и тексту
-function GetFontSizeByW(W: real; text: string): FontOptions;
-///Шрифт по заданной высоте и тексту
-function GetFontSizeByH(H: real; text: string): FontOptions;
-
 //функции генерации и вывода JS кода
 procedure FillRectangleJS(x,y,w,h:real; fillColor:Color);
 procedure DrawRectangleJS(x,y,w,h:real; fillColor,strokeColor:Color; width: real);
@@ -250,10 +170,10 @@ procedure DrawLinesJS(arr_x,arr_y:List<real>; lineColor:Color; width:real);
 procedure FillCircleJS(x,y,r:real; fillColor:Color);
 procedure DrawScatterJS(arr_x,arr_y:List<real>; lineColor:Color; r:real);
 procedure TextOutJS(x,y:real; text: string; fnt:FontOptions);
+procedure TextOutJS(x,y:real; text: string;align_x:string:='left';align_y:string:='top');
 procedure OutputJS(text :string);
-
-function TextWidthPFont(text: string; f: FontOptions) :real;
-function TextHeightPFont(text: string; f: FontOptions) :real;
+procedure SetAxesNumsSizeJS(ac:AxesContainer);
+procedure SetSizeByWHJS(text,font_name:string;w,h:real);
 
 procedure NeedButtons(flag: boolean);
 
@@ -287,21 +207,8 @@ var curOutputId := '';
 
 procedure NeedButtons(flag: boolean):= drawUI := flag;
 
-function GetBrush(c: GColor): GBrush := new SolidColorBrush(c);
-function ARGB(a,r,g,b: byte) := Color.FromArgb(a, r, g, b);
+function ARGB(a,r,g,b: byte) := new Color(r, g, b, a);
 function EmptyColor: Color := ARGB(0,0,0,0);
-
-var FontFamiliesDict := new Dictionary<string,FontFamily>;
-function GetFontFamily(name: string): FontFamily;
-    begin
-      if not (name in FontFamiliesDict) then
-      begin
-        var b := new FontFamily(name);
-        FontFamiliesDict[name] := b;
-        Result := b
-      end
-      else Result := FontFamiliesDict[name];
-    end;
 
 procedure Show(f: Figure);
 begin
@@ -322,7 +229,6 @@ begin
   OutputJS('cv_'+curOutputId+'.addEventListener("mousemove", function(e){getCursorPosition_'+curOutputId+'(cv_'+curOutputId+', e);});');
   FillRectangleJS(0,0,w,h,fig.GetFacecolor);
 	
-  //FastDraw(dc -> DrawRectangleDC(dc, 0, 0, w, h, fig.GetFacecolor, EmptyColor, 1.0));
   
   var axes_x_size := ((w - Borders.Item1) / fig.GetAxesMatrix.ColCount) - Borders.Item1;
   var axes_y_size := ((h - Borders.Item2) / fig.GetAxesMatrix.RowCount) - Borders.Item2;
@@ -369,6 +275,7 @@ begin
                       (axes_y_size * count_y) + (Borders.Item2 * (count_y - 1)),
                         fig.GetAxes[k], fig);   
   end;
+  OutputJS('SetPositionFontSize();');
   OutputJS('</script></html>');
   
   if drawUI then
@@ -384,16 +291,7 @@ end;
 procedure DrawAxes(x, y, size_x, size_y: real; ax: Axes; fig: Figure);
 begin
   var ax_cont := new AxesContainer(x, y, size_x, size_y, ax); 
-
-  AxContList.Add(ax_cont);
   
-  DrawCoordinates(ax_cont, fig);
-  DrawCurves(ax_cont);
-  DrawLegend(ax_cont);
-
-  var text := 'X: 9.999 Y: 9.999';
-  var h := TextHeightPFont(text,ax_cont.NumsFont);
-  var w := TextWidthPFont(text,ax_cont.NumsFont);
   var flag := 'false';
   if ax.TrackMouse then
     flag := 'true';
@@ -408,17 +306,23 @@ begin
                       'origin_x:'+(ax_cont.Position.Item1+ax_cont.fborders.Item1).ToString+','+  //origin
                       'origin_y:'+(ax_cont.Position.Item2+ax_cont.Size.Item2-ax_cont.fborders.Item2).ToString+','+
                       'need_position:'+flag+','+   //need track mouse
-                      'position_x:'+(ax_cont.Position.Item1+ax_cont.Size.Item1-ax_cont.ClearableSize.Item1).ToString+','+ //position of position
-                      'position_y:'+ax_cont.Position.Item2.ToString+','+
-                      'position_width:'+ax_cont.ClearableSize.Item1.ToString+','+   //position size
-                      'position_height:'+ax_cont.ClearableSize.Item2.ToString+','+
+                      'position_width:'+ax_cont.Size.Item1/3+','+   //position size
+                      'position_height:'+ax_cont.fborders.Item2*0.9+','+
                       'position_font_size:'+(ax_cont.NumsFont.Size/96*72).ToString+','+
                       'position_font_name:"'+ax_cont.NumsFont.Name+'",'+
                       'R:'+fig.GetFacecolor.R+',G:'+fig.GetFacecolor.G+',B:'+fig.GetFacecolor.B+','
                       'step_x:'+ax_cont.Step.Item1+',step_y:'+ax_cont.Step.Item2+','
-                      'field_origin_x:'+ax_cont.OriginXY.Item1+',field_origin_y:'+ax_cont.OriginXY.Item2+','
-                      'text_width:'+w+',text_height:'+h+
+                      'field_origin_x:'+ax_cont.OriginXY.Item1+',field_origin_y:'+ax_cont.OriginXY.Item2+
                       '});';
+  
+  AxContList.Add(ax_cont);
+  
+  DrawCoordinates(ax_cont, fig);
+  DrawCurves(ax_cont);
+  DrawLegend(ax_cont);
+
+  
+  
  OutputJS(s);
  
 end;
@@ -433,93 +337,66 @@ begin
   var(x_mult, y_mult) := ac.AxesMultipliers;
   
   
-  //FastDraw(dc_ax ->
+  
+  FillRectangleJS(x,y,size_x,size_y,fig.GetFacecolor);        
+          
+  
+  //название
+  if (ac.GetAxes.Title <> nil) and (ac.GetAxes.Title.Length > 0) then
   begin
-    //Область рисования Figure(совпадает по цвету с фоном)
-    //DrawRectangleDC(dc_ax, x, y, size_x, size_y, fig.GetFacecolor, EmptyColor, 
-     //                 ac.LineWidth * 0.8);
-	  FillRectangleJS(x,y,size_x,size_y,fig.GetFacecolor);        
-	          
-    
-    
-    if (ac.GetAxes.Title <> nil) and (ac.GetAxes.Title.Length > 0) then
-    begin
-      var fnt := GetFontSizeByH(y_border,ac.GetAxes.Title);
-      var w :=TextWidthPFont(ac.GetAxes.Title,fnt);
-      ac.ClearableSize := (size_x/2 - w/2, y_border*0.9);
-      //TextoutDC(dc_ax,x+size_x/2-w/2,y,ac.GetAxes.Title,Alignment.LeftTop,0,fnt);
-      TextOutJS(x+size_x/2-w/2,y,ac.GetAxes.Title,fnt);
-    end;
-    
-    //Область рисования для Axes
-    //DrawRectangleDC(dc_ax, ac.AbsoluteOrigin.Item1, ac.AbsoluteOrigin.Item2 - field_y, 
-     //               field_x, field_y, ac.GetAxes.GetFacecolor, Colors.Black, ac.LineWidth * 0.5);
-    
-    DrawRectangleJS(ac.AbsoluteOrigin.Item1,ac.AbsoluteOrigin.Item2 - field_y,
-                  field_x, field_y,ac.GetAxes.GetFacecolor,Colors.Black,ac.LineWidth * 0.5);
-    
-    var fnt := ac.NumsFont;
-    
-    //отрисовка чёрточек и сетки
-    var temp := origin.Item1 + (ac.Xnums[0] - ac.originxy.Item1) * ac.Step.Item1;
-    for var i := 0 to ac.XNums.Length - 1 do 
-    begin
-      if temp > field_x + x_border then
-        break;
-      if ac.GetBarLabels = nil then
-      begin
-        //DrawLineDC(dc_ax, x + temp, y + origin.Item2, x + temp, y + origin.Item2 + y_border * 0.3, 
-         //           Colors.Black, ac.LineWidth * 0.5);
-        DrawLineJS(x+temp,y+origin.Item2,x+temp,y + origin.Item2 + y_border * 0.3,Colors.Black,ac.LineWidth * 0.5);
-        //TextOutDC(dc_ax, x + temp - TextWidthPFont('' + ac.XNums[i], fnt) / 2, 
-        //          y + origin.Item2 + y_border * 0.35,
-        //          ac.XNums[i].ToString, Alignment.LeftTop, 0, fnt);
-        TextOutJS(x + temp - TextWidthPFont('' + ac.XNums[i], fnt) / 2, 
-                  y + origin.Item2 + y_border * 0.35,
-                  ac.XNums[i].ToString,fnt);
-      end;
-      
-      //сетка
-      if ac.GetAxes.grid then
-      begin
-        //DrawLineDC(dc_ax, x + temp, y + origin.Item2, x + temp, y + y_border, 
-        //            Colors.Gray, ac.LineWidth * 0.5);
-        DrawLineJS(x + temp, y + origin.Item2, x + temp, y + y_border, 
-                    Colors.Gray, ac.LineWidth * 0.5);
-      end;
-      
-      
-      temp += ac.Step.Item1 * x_mult;
-    end;
-    
-    temp := origin.Item2 - (ac.Ynums[0] - ac.originxy.Item2) * ac.Step.Item2;
-    for var i := 0 to ac.YNums.Length - 1 do 
-    begin
-      if temp < y_border then
-        break;
-      //DrawLineDC(dc_ax, x + origin.Item1, y + temp, x + origin.Item1 - x_border * 0.3, 
-      //            y + temp, Colors.Black, ac.LineWidth * 0.5);
-      DrawLineJS(x + origin.Item1, y + temp, x + origin.Item1 - x_border * 0.3, 
-                  y + temp, Colors.Black, ac.LineWidth * 0.5);
-      //TextOutDC(dc_ax, x + origin.Item1 - x_border * 0.4 - TextWidthPFont('' + ac.YNums[i], fnt), 
-      //           y + temp - TextHeightPFont('' + ac.YNums[i], fnt) / 2, 
-      //          ac.YNums[i].ToString(), Alignment.LeftTop, 0, fnt);
-      TextOutJS(x + origin.Item1 - x_border * 0.4 - TextWidthPFont('' + ac.YNums[i], fnt), 
-                  y + temp - TextHeightPFont('' + ac.YNums[i], fnt) / 2, 
-                  ac.YNums[i].ToString(),fnt);
-      
-      //сетка
-      if ac.GetAxes.grid then
-      begin
-        //DrawLineDC(dc_ax, x + origin.Item1, y + temp, x + x_border + field_x, y + temp, 
-        //            Colors.Gray, ac.LineWidth * 0.5);
-        DrawLineJS(x + origin.Item1, y + temp, x + x_border + field_x, y + temp, 
-                    Colors.Gray, ac.LineWidth * 0.5);            
-      end;
-      
-      temp -= ac.Step.Item2 * y_mult;
-    end;
+    ac.ClearableSize := (size_x/3, y_border*0.9);
+    SetSizeByWHJS(ac.GetAxes.Title,ac.NumsFont.Name,size_x/3,y_border);
+    TextOutJS(x+size_x/2,y,ac.GetAxes.Title,'center');
   end;
+  
+  //Область рисования для Axes
+  DrawRectangleJS(ac.AbsoluteOrigin.Item1,ac.AbsoluteOrigin.Item2 - field_y,
+                field_x, field_y,ac.GetAxes.GetFacecolor,Colors.Black,ac.LineWidth * 0.5);
+  
+  var fnt := ac.NumsFont;
+  SetAxesNumsSizeJS(ac);
+  //отрисовка чёрточек и сетки
+  var temp := origin.Item1 + (ac.Xnums[0] - ac.originxy.Item1) * ac.Step.Item1;
+  for var i := 0 to ac.XNums.Length - 1 do 
+  begin
+    if temp > field_x + x_border then
+      break;
+    if ac.GetBarLabels = nil then
+    begin
+      DrawLineJS(x+temp,y+origin.Item2,x+temp,y + origin.Item2 + y_border * 0.3,Colors.Black,ac.LineWidth * 0.5);
+      TextOutJS(x + temp,y + origin.Item2 + y_border * 0.35,ac.XNums[i].ToString,'center');
+    end;
+    
+    //сетка
+    if ac.GetAxes.grid then
+    begin
+      DrawLineJS(x + temp, y + origin.Item2, x + temp, y + y_border, 
+                  Colors.Gray, ac.LineWidth * 0.5);
+    end;
+    
+    
+    temp += ac.Step.Item1 * x_mult;
+  end;
+  
+  temp := origin.Item2 - (ac.Ynums[0] - ac.originxy.Item2) * ac.Step.Item2;
+  for var i := 0 to ac.YNums.Length - 1 do 
+  begin
+    if temp < y_border then
+      break;
+    DrawLineJS(x + origin.Item1, y + temp, x + origin.Item1 - x_border * 0.3, 
+                y + temp, Colors.Black, ac.LineWidth * 0.5);
+    TextOutJS(x + origin.Item1 - x_border * 0.4,y + temp,ac.YNums[i].ToString,'right','center');
+    
+    //сетка
+    if ac.GetAxes.grid then
+    begin
+      DrawLineJS(x + origin.Item1, y + temp, x + x_border + field_x, y + temp, 
+                  Colors.Gray, ac.LineWidth * 0.5);            
+    end;
+    
+    temp -= ac.Step.Item2 * y_mult;
+  end;
+  
   
 end;
 
@@ -551,53 +428,40 @@ begin
   var split := h*0.05;
   var h1 := (h-split*with_names.Count)/with_names.Count;
   
-  foreach var i in with_names do
-  begin
-    var temp := GetFontSizeByWH(w*0.6,h1,crv[i].Name);
-    if temp.Size < fnt.Size then
-      fnt.Size := temp.Size;
-  end;
-  
   
   var l_pos :=(x+field_x+x_border-w*1.1, y+y_border+h*0.1);
   
   var cur_y:= l_pos.Item2 + split;
-  //FastDraw(dc ->
+
+
+  DrawRectangleJS(l_pos.Item1, l_pos.Item2,
+                  w,h,Colors.White,Colors.Black,ac.flinewidth*0.5);
+  
+  var cl: Color;
+  foreach var i in with_names do
   begin
-    //DrawRectangleDC(dc,l_pos.Item1, l_pos.Item2,
-    //               w,h,Colors.White,Colors.Black,ac.flinewidth*0.5);
-    DrawRectangleJS(l_pos.Item1, l_pos.Item2,
-                    w,h,Colors.White,Colors.Black,ac.flinewidth*0.5);
-    
-    var cl: Color;
-    foreach var i in with_names do
-    begin
-      cl := crv[i].GetFacecolor;
-      case (crv[i].GetCurveType) of
-        CurveType.ScatterGraph: 
-        begin
-          //DrawEllipseDC(dc,l_pos.Item1+w*0.25,cur_y+h1/2,h1*0.4,h1*0.4,cl,EmptyColor,0);
-          FillCircleJS(l_pos.Item1+w*0.25,cur_y+h1/2,h1*0.4,cl);
-        end;
-        CurveType.LineGraph: 
-        begin
-          //DrawLineDC(dc,l_pos.Item1+w*0.1,cur_y+h1/2,l_pos.Item1+w*0.3,cur_y+h1/2,
-          //           cl,crv[i].linewidth*ac.GetPtSize);
-          DrawLineJS(l_pos.Item1+w*0.1,cur_y+h1/2,l_pos.Item1+w*0.3,cur_y+h1/2,
-                      cl,crv[i].linewidth*ac.GetPtSize);
-        end;
-        CurveType.barGraph: 
-        begin
-          //DrawRectangleDC(dc,l_pos.Item1+w*0.1,cur_y,w*0.2,h1*0.8,cl,EmptyColor,0);
-          DrawRectangleJS(l_pos.Item1+w*0.1,cur_y,w*0.2,h1*0.8,cl,EmptyColor,0);
-        end;
+    cl := crv[i].GetFacecolor;
+    case (crv[i].GetCurveType) of
+      CurveType.ScatterGraph: 
+      begin
+        FillCircleJS(l_pos.Item1+w*0.25,cur_y+h1/2,h1*0.4,cl);
       end;
-      //DrawTextDC(dc,l_pos.Item1+w*0.4,cur_y,w*0.6,h1,crv[i].Name,alignment.LeftCenter,0,fnt);
-      TextOutJS(l_pos.Item1+w*0.4,cur_y+h1/4,crv[i].Name,fnt);
-      cur_y += h1+split;
+      CurveType.LineGraph: 
+      begin
+        DrawLineJS(l_pos.Item1+w*0.1,cur_y+h1/2,l_pos.Item1+w*0.3,cur_y+h1/2,
+                    cl,crv[i].linewidth*ac.GetPtSize);
+      end;
+      CurveType.barGraph: 
+      begin
+        DrawRectangleJS(l_pos.Item1+w*0.1,cur_y,w*0.2,h1*0.8,cl,EmptyColor,0);
+      end;
     end;
-    
+    SetSizeByWHJS(crv[i].Name,ac.NumsFont.Name,w*0.5,h1);
+    TextOutJS(l_pos.Item1+w*0.4,cur_y+h1/4,crv[i].Name,'left');
+    //TextOutJS(l_pos.Item1+w*0.4,cur_y+h1/4,crv[i].Name,fnt);
+    cur_y += h1+split;
   end;
+
 end;
 
 procedure DrawCurves(ac: AxesContainer);
@@ -628,42 +492,32 @@ begin
   
   var width_draw := (crv.width / 2) * ac.step.Item1;
   
-  //FastDraw(dc_bars ->
+
+
+  for var i := 0 to crv.X.Length - 1 do
   begin
-    for var i := 0 to crv.X.Length - 1 do
+    var x := ((crv.X[i] - crv.width / 2) - ac.originxy.Item1) * ac.step.Item1;
+    var h := abs(crv.Y[i]) * ac.step.Item2;
+    
+    if ac.GetBarLabels <> nil then
     begin
-      var x := ((crv.X[i] - crv.width / 2) - ac.originxy.Item1) * ac.step.Item1;
-      var h := abs(crv.Y[i]) * ac.step.Item2;
-      
-      if ac.GetBarLabels <> nil then
-      begin
-        //DrawLineDC(dc_bars, o_x + x + width_draw, o_y, o_x + x + width_draw, 
-        //           o_y + y_border * 0.3, Colors.Black, ac.LineWidth * 0.5);
-        DrawLineJS(o_x + x + width_draw, o_y, o_x + x + width_draw, 
-                   o_y + y_border * 0.3, Colors.Black, ac.LineWidth * 0.5);  
-        //TextOutDC(dc_bars, o_x + x + width_draw - TextWidthPFont(crv.GetBarLabels[i], 
-        //          ac.NumsFont) / 2,o_y + y_border * 0.35, crv.GetBarLabels[i],
-        //          Alignment.LeftTop, 0, ac.NumsFont);
-        TextoutJS(o_x + x + width_draw - TextWidthPFont(crv.GetBarLabels[i], 
-                  ac.NumsFont) / 2,o_y + y_border * 0.35, crv.GetBarLabels[i], ac.NumsFont);
-      end;
-      if (crv.Y[i] > 0) then
-      begin
-        //DrawRectangleDC(dc_bars, o_x + x, null_y - h, crv.width * ac.Step.Item1,
-        //                h, crv.GetFacecolor, Colors.Black, crv.linewidth * 0.5);
-        DrawRectangleJS(o_x + x, null_y - h, crv.width * ac.Step.Item1,
-                        h, crv.GetFacecolor, Colors.Black, crv.linewidth * 0.5);
-      end
-      else
-      begin
-        //DrawRectangleDC(dc_bars, o_x + x, null_y, crv.width * ac.Step.Item1,
-        //                h, crv.GetFacecolor, Colors.Black, crv.linewidth * 0.5);
-        DrawRectangleJS(o_x + x, null_y, crv.width * ac.Step.Item1,
-                        h, crv.GetFacecolor, Colors.Black, crv.linewidth * 0.5);
-      end;
-      
+      DrawLineJS(o_x + x + width_draw, o_y, o_x + x + width_draw, 
+                 o_y + y_border * 0.3, Colors.Black, ac.LineWidth * 0.5);  
+      TextOutJS(o_x + x + width_draw,o_y + y_border * 0.35,crv.GetBarLabels[i],'center');
     end;
+    if (crv.Y[i] > 0) then
+    begin
+      DrawRectangleJS(o_x + x, null_y - h, crv.width * ac.Step.Item1,
+                      h, crv.GetFacecolor, Colors.Black, crv.linewidth * 0.5);
+    end
+    else
+    begin
+      DrawRectangleJS(o_x + x, null_y, crv.width * ac.Step.Item1,
+                      h, crv.GetFacecolor, Colors.Black, crv.linewidth * 0.5);
+    end;
+    
   end;
+
 end;
 
 procedure DrawLineGraph(ac: AxesContainer; ind: integer);
@@ -689,84 +543,69 @@ begin
     var (x_bounded, y_bounded) := (ax.isxbounded, ax.isybounded);
     
     
+    var x := x_min;
+    if (not x_bounded) or (ac.OriginXY.Item1 > x_min) then
+      x := ac.OriginXY.Item1;
+    var y: real?;
+    var (prev_x, prev_y) := (0.0, 0.0);
     
-    //FastDraw(dc_curve ->
+    while (true) do
     begin
-      var x := x_min;
-      if (not x_bounded) or (ac.OriginXY.Item1 > x_min) then
-        x := ac.OriginXY.Item1;
-      var y: real?;
-      var (prev_x, prev_y) := (0.0, 0.0);
+      var draw_x := o_x + (x - ac.originxy.Item1) * ac.step.Item1;
       
-      while (true) do
+      if (x_bounded and (x >= x_max))
+          or (draw_x > xx + size_x - x_border) then
+        break;
+      
+      y := crv.GetY(x);
+      if (not y.HasValue) or 
+         (y_bounded and ((y.Value < y_min) or (y.Value > y_max))) then
       begin
-        var draw_x := o_x + (x - ac.originxy.Item1) * ac.step.Item1;
-        
-        if (x_bounded and (x >= x_max))
-            or (draw_x > xx + size_x - x_border) then
-          break;
-        
-        y := crv.GetY(x);
-        if (not y.HasValue) or 
-           (y_bounded and ((y.Value < y_min) or (y.Value > y_max))) then
-        begin
-          x += func_step;
-          continue;
-        end;
-        
-        var draw_y := o_y - (y.Value - ac.originxy.Item2) * ac.step.Item2;
-        
-        if (draw_x < xx + x_border)  or
-            (draw_y < yy + y_border) or 
-            (draw_y > yy + size_y - y_border) then
-        begin
-          x += func_step;
-          continue;
-        end;
-        
-        if (prev_x, prev_y) = (0.0, 0.0) then
-        begin
-          arr_x.Add(draw_x); arr_y.Add(draw_y);
-          (prev_x, prev_y) := (draw_x, draw_y);
-          x += func_step;
-          continue;
-        end;
-        
-        
-        //DrawLineDC(dc_curve, prev_x, prev_y, draw_x, draw_y, crv.GetFacecolor,
-        //            crv.linewidth * ac.GetPtSize);
-        //DrawLineJS(prev_x, prev_y, draw_x, draw_y, crv.GetFacecolor,
-        //            crv.linewidth * ac.GetPtSize);
+        x += func_step;
+        continue;
+      end;
+      
+      var draw_y := o_y - (y.Value - ac.originxy.Item2) * ac.step.Item2;
+      
+      if (draw_x < xx + x_border)  or
+          (draw_y < yy + y_border) or 
+          (draw_y > yy + size_y - y_border) then
+      begin
+        x += func_step;
+        continue;
+      end;
+      
+      if (prev_x, prev_y) = (0.0, 0.0) then
+      begin
         arr_x.Add(draw_x); arr_y.Add(draw_y);
-        
         (prev_x, prev_y) := (draw_x, draw_y);
         x += func_step;
-      end; 
+        continue;
+      end;
+      
+
+      arr_x.Add(draw_x); arr_y.Add(draw_y);
+      
+      (prev_x, prev_y) := (draw_x, draw_y);
+      x += func_step;
+
     end;
     DrawLinesJS(arr_x,arr_y,crv.GetFacecolor,crv.linewidth * ac.GetPtSize);
     exit;
   end;
-  
-  
-  //FastDraw(dc_curve ->
+
+  var x1 := (crv.X[0] - ac.originxy.Item1) * ac.step.Item1;
+  var y1 := (crv.Y[0] - ac.originxy.Item2) * ac.step.Item2;
+  arr_x.Add(o_x + x1); arr_y.Add(o_y - y1);
+  for var i := 1 to crv.X.Length - 1 do
   begin
-    var x1 := (crv.X[0] - ac.originxy.Item1) * ac.step.Item1;
-    var y1 := (crv.Y[0] - ac.originxy.Item2) * ac.step.Item2;
-    arr_x.Add(o_x + x1); arr_y.Add(o_y - y1);
-    for var i := 1 to crv.X.Length - 1 do
-    begin
-      var x := (crv.X[i] - ac.originxy.Item1) * ac.step.Item1;
-      var y := (crv.Y[i] - ac.originxy.Item2) * ac.step.Item2;
-      //DrawLineDC(dc_curve, o_x + x1, o_y - y1, o_x + x, o_y - y, crv.GetFacecolor, 
-      //            crv.linewidth * ac.GetPtSize);
-                  
-      //DrawLineJS(o_x + x1, o_y - y1, o_x + x, o_y - y, crv.GetFacecolor, 
-      //            crv.linewidth * ac.GetPtSize);
-      arr_x.Add(o_x + x); arr_y.Add(o_y - y);
-      
-      (x1, y1) := (x, y);
-    end;
+    var x := (crv.X[i] - ac.originxy.Item1) * ac.step.Item1;
+    var y := (crv.Y[i] - ac.originxy.Item2) * ac.step.Item2;
+    arr_x.Add(o_x + x); arr_y.Add(o_y - y);
+    
+    (x1, y1) := (x, y);
   end;
+
   DrawLinesJS(arr_x,arr_y,crv.GetFacecolor,crv.linewidth * ac.GetPtSize);
 end;
 
@@ -827,9 +666,6 @@ begin
           continue;
         end;
         
-        //DrawEllipseDC(dc_curve, draw_x, draw_y, markersize, markersize, crv.GetFacecolor, 
-         //             EmptyColor, 1);
-        //FillCircleJS(draw_x, draw_y, markersize, crv.GetFacecolor);
         arr_x.Add(draw_x); arr_y.Add(draw_y);
         x += func_step;
       end; 
@@ -838,19 +674,15 @@ begin
     exit;
   end;
   
-  //FastDraw(dc_curve ->
+
+  for var i := 0 to crv.X.Length - 1 do
   begin
-    for var i := 0 to crv.X.Length - 1 do
-    begin
-      var x := (crv.X[i] - ac.originxy.Item1) * ac.step.Item1;
-      var y := (crv.Y[i] - ac.originxy.Item2) * ac.step.Item2;
-      
-      //DrawEllipseDC(dc_curve, o_x + x, o_y - y, markersize, markersize, crv.GetFacecolor, 
-      //              EmptyColor, 1);
-      //FillCircleJS(o_x + x, o_y - y, markersize, crv.GetFacecolor);
-      arr_x.Add(o_x + x); arr_y.Add(o_y - y);
-    end;
+    var x := (crv.X[i] - ac.originxy.Item1) * ac.step.Item1;
+    var y := (crv.Y[i] - ac.originxy.Item2) * ac.step.Item2;
+    
+    arr_x.Add(o_x + x); arr_y.Add(o_y - y);
   end;
+
   DrawScatterJS(arr_x,arr_y,crv.GetFacecolor,markersize);
 end;
 
@@ -858,60 +690,6 @@ procedure WindowSize(width, height: integer);
 begin
   w := width;
   h := height;
-end;
-
-var RusCultureInfo := new System.Globalization.CultureInfo('ru-ru');
-function FormTextFont(text: string; f: FontOptions): FormattedText;
-begin
-  var tf := new Typeface(GetFontFamily(f.Name),f.tf.Style,f.tf.Weight,f.tf.Stretch);
-  Result := new FormattedText(text,RusCultureInfo, FlowDirection.LeftToRight, tf, f.Size, f.BrushClone);
-end; 
-function TextWidthPFont(text: string; f: FontOptions) := FormTextFont(text,f).Width;
-function TextHeightPFont(text: string; f: FontOptions) := FormTextFont(text,f).Height;
-
-
-function GetFontSizeByW(W: real; text: string): FontOptions;
-begin
-  var fnt := new FontOptions;
-  var cur_width := TextWidthPFont(text, fnt);
-  while (cur_width > w) do
-  begin
-    fnt.Size -= 0.1;
-    cur_width := TextWidthPFont(text, fnt);
-  end;
-  while (cur_width < w * 0.9) do
-  begin
-    fnt.Size += 0.1;
-    cur_width := TextWidthPFont(text, fnt);
-  end;
-  Result := fnt;
-end;
-
-function GetFontSizeByH(H: real; text: string): FontOptions;
-begin
-  var fnt := new FontOptions;
-  var cur_height := TextHeightPFont(text, fnt);
-  while (cur_height > h) do
-  begin
-    fnt.Size -= 0.1;
-    cur_height := TextHeightPFont(text, fnt);
-  end;
-  while (cur_height < h * 0.9) do
-  begin
-    fnt.Size += 0.1;
-    cur_height := TextHeightPFont(text, fnt);
-  end;
-  Result := fnt;
-end;
-
-function GetFontSizeByWH(W, H: real; text: string): FontOptions;
-begin
-  var Hfont := GetFontSizeByH(h, text);
-  var Wfont := GetFontSizeByW(h, text);
-  if Hfont.Size < Wfont.Size then
-    Result := Hfont
-  else
-    Result := Wfont;
 end;
 
 //////////////////////////////////
@@ -928,39 +706,6 @@ begin
     y1 := OriginXY.Item2 + (AbsoluteOrigin.Item2 - y) / Step.Item2;
     DrawMousePosition(self, x1, y1);
   end; 
-end;
-
-procedure AxesContainer.SetNumSize;
-begin
-  var (x_border, y_border) := borders;
-  
-  var size1 := y_border;
-  NumsFont := new FontOptions();
-  NumsFont.Size := size1;
-  var cur_height := TextHeightPFont('' + fxnums[0], NumsFont);
-  while (cur_height > y_border * 0.7) do
-  begin
-    NumsFont.Size -= 0.1;
-    cur_height := TextHeightPFont('' + fxnums[0], NumsFont);
-  end;
-  while (cur_height < y_border * 0.6) do
-  begin
-    NumsFont.Size += 0.1;
-    cur_height := TextHeightPFont('' + fxnums[0], NumsFont);
-  end;
-  
-  var longest_num := fynums[fynums.Length - 1];
-  if TextWidthPFont('' + longest_num, NumsFont) < TextWidthPFont('' + fynums[0], NumsFont) then
-    longest_num := fynums[0];
-  
-  var cur_width := TextWidthPFont('' + longest_num, NumsFont);
-  
-  while (cur_width > x_border * 0.7) do
-  begin
-    NumsFont.Size -= 0.1;
-    cur_width := TextWidthPFont('' + longest_num, NumsFont);
-  end;
-  
 end;
 
 procedure AxesContainer.SetNums;
@@ -1238,16 +983,6 @@ begin
   var x_str,y_str: string;
   Str(x:0:3,x_str); Str(y:0:3,y_str);
   var text := 'X: '+x_str+' Y: '+y_str;
-  
-  //FastDraw(dc->
-  begin
-    //DrawRectangleDC(dc,x_glob+size_x-ac.ClearableSize.Item1,y_glob,
-     //               ac.ClearableSize.Item1,ac.ClearableSize.Item2,
-     //               fig.GetFacecolor,EmptyColor,1);
-    //DrawTextDC(dc,x_glob+size_x-w*1.1,y_glob,w,h,
-    //              text,Alignment.LeftTop,0,fnt);
-  end;
-  
 end;
 
 procedure FillRectangleJS(x,y,w,h:real; fillColor:Color);
@@ -1307,12 +1042,36 @@ end;
 
 procedure TextOutJS(x,y:real; text: string; fnt:FontOptions);
 begin
-  y := y+TextHeightPFont(text,fnt)*0.15;
+  //y := y+TextHeightPFont(text,fnt)*0.15;
   OutputJS('cx_'+curOutputId+'.font = "'+ (fnt.Size/96*72) +'pt '+fnt.Name+'";'+
             'cx_'+curOutputId+'.fillStyle = "black";'+
             'cx_'+curOutputId+'.textAlign = "left";'+
             'cx_'+curOutputId+'.textBaseline = "top";'+
             'cx_'+curOutputId+'.fillText("'+text+'", '+x.ToString('0.000')+','+y.ToString('0.000')+');');
+end;
+
+procedure TextOutJS(x,y:real; text: string; align_x,align_y:string);
+begin
+  
+  OutputJS('Txt('+x.ToString('0.000')+','+y.ToString('0.000')+',"'+text+'","'+align_x+'","'+align_y+'");');
+end;
+
+procedure SetSizeByWHJS(text,font_name:string;w,h:real);
+begin
+  OutputJS('GetSizeByWH("'+text+'","'+font_name+'",'+w+','+h+');'); 
+end;
+
+procedure SetAxesNumsSizeJS(ac:AxesContainer);
+begin
+  OutputJS('SetAxesNumsSize('+ac.Position.Item1.ToString('0.000')+','+
+            ac.Position.Item2.ToString('0.000')+',[');
+  for var i := 0 to ac.XNums.length-2 do
+    OutputJS(ac.XNums[i]+',');
+  OutputJS(ac.XNums[ac.XNums.length-1]+'],[');
+  for var i := 0 to ac.YNums.length-2 do
+    OutputJS(ac.YNums[i]+',');
+  OutputJS(ac.YNums[ac.YNums.length-1]+'],'+ac.fborders.Item1+','+ac.fborders.Item2+',"'+
+            ac.NumsFont.Name+'");');
 end;
 
 procedure OutputJS(text :string);

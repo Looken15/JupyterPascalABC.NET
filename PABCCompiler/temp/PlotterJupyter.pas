@@ -8,9 +8,9 @@ type
   Figure = FigureModule.Figure;
   Axes = FigureModule.Axes;
   Curve = FigureModule.Curve;
-  Color = System.Windows.Media.Color;
-  Colors = System.Windows.Media.Colors;
-
+  Color = FigureModule.Color;
+  Colors = FigureModule.Colors;
+  
 ///Создать область отображения графиков
 function GetFigure(): Figure;
 ///Создать область отображения с графиками
