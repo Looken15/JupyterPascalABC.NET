@@ -132,10 +132,8 @@ namespace ZMQServer.Sockets
             }
             if (s == "[END]")
             {
-                ////Для Jupyter Lab
-
                 Iopub.ClearOutput();
-                Iopub.SendDisplayData(lastString, currentHeader, currentIdenteties, true, currentId);
+                Iopub.SendExecutionData(lastString, currentHeader, currentIdenteties);
                 lastString = "";
 
 
@@ -146,21 +144,7 @@ namespace ZMQServer.Sockets
                 Iopub.SendStatus("idle", currentHeader, currentIdenteties);
                 return;
             }
-            //if (!firstLine)
-            //   Iopub.ClearOutput();
-            //resultString.Append(s);
-
-
-            // Для Jupyter Lab 
             Iopub.SendDisplayData(s, currentHeader, currentIdenteties, !firstLine, currentId);
-
-            
-            
-
-            //Для Jupyter Notebook
-            //Iopub.SendExecutionData(s, currentHeader, currentIdenteties);
-
-
             firstLine = false;
             lastString = s;
         }

@@ -165,7 +165,20 @@ namespace ZMQServer.Sockets
             iopubSocket.SendMoreFrame(JsonSerializer.Serialize(metadata));
             iopubSocket.SendFrame(JsonSerializer.Serialize(content));
 
+            var script = "<script>" +
+                "var classElements = document.getElementsByClassName('jp-Cell-outputWrapper');" +
+                "for (var i = 0; i < classElements.length; i++)" +
+                "{" +
+                "var preElements = classElements[i].getElementsByTagName('pre');" +
+                "for (var j = 0; j < preElements.length; j++)" +
+                "{" +
+                "   preElements[j].remove();" +
+                "}" +
+                "}" +
+                "</script>";
+
             //SendDisplayData("", parentHeader, identeties, true, Shell.currentId);
+            SendDisplayData(script, parentHeader, identeties, true, Shell.currentId);
             //SendExecutionData("", parentHeader, identeties);
             //Server.executionCounter--;
         }
