@@ -72,8 +72,8 @@ end;
 procedure SendReadlnRequest;
 begin
   ReadlnSignalSended := true;
-  if not IsInputPipedOrRedirectedFromFile then
-    WriteToProcessErrorStream(ReadlnSignalCommand);
+  //if not IsInputPipedOrRedirectedFromFile then
+  WriteToProcessErrorStream(ReadlnSignalCommand);
 end;
 
 function __ReadSignalOISystem.peek: integer;
@@ -91,7 +91,7 @@ begin
   if not ReadlnSignalSended then
     SendReadlnRequest;
   c := inherited read_symbol;
-  if (LastReadSymbol=N) and (c=R) then
+  if (LastReadSymbol=N) or (c=R) then
     ReadlnSignalSended := false;  
   LastReadSymbol := c;
   result := c;
@@ -99,8 +99,8 @@ end;
 
 function __ReadSignalOISystem.ReadLine: string; 
 begin
-  if not ReadlnSignalSended then
-    SendReadlnRequest;
+  //if not ReadlnSignalSended then
+  SendReadlnRequest;
   var s := inherited ReadLine;
   ReadlnSignalSended := false;
   LastReadSymbol := R;
